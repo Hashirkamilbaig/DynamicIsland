@@ -43,11 +43,13 @@ final class IslandWindowController {
 
     private func createPanel() {
         let view = IslandView(state: state)
+        let initialFrame = NSRect(x: 0, y: 0, width: 220, height: 34)
         let hostingView = NSHostingView(rootView: view)
-        hostingView.frame = NSRect(x: 0, y: 0, width: 220, height: 34)
+        hostingView.frame = initialFrame
+        hostingView.autoresizingMask = [.width, .height]
 
         let panel = IslandPanel(
-            contentRect: hostingView.frame,
+            contentRect: initialFrame,
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -63,6 +65,7 @@ final class IslandWindowController {
         panel.becomesKeyOnlyIfNeeded = true
         panel.isMovableByWindowBackground = false
         panel.ignoresMouseEvents = false
+        panel.animationBehavior = .utilityWindow
 
         self.hosting = hostingView
         self.panel = panel
