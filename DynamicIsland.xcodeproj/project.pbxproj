@@ -1,0 +1,470 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C55AA5F980004AB68078ACBE /* DynamicIslandApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494D1B622A6B46DEB5A62D17 /* DynamicIslandApp.swift */; };
+		54932E9C4B534CE88809B65E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B172EC76F34BF98CAD12AB /* AppDelegate.swift */; };
+		699B0E12B8B84AE3A065859E /* IslandWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058EBA2BD5AF4ECABA09D927 /* IslandWindowController.swift */; };
+		25290FF5A83E415A82E0F5E8 /* IslandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965551AE2F174BCABDA7A7D8 /* IslandView.swift */; };
+		5320531EEEBD4CB6A854D3C1 /* IslandState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55A75EA05D34981B96D6FB8 /* IslandState.swift */; };
+		5F9BD25F56C84533A8D69C4C /* ShelfStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D925DB415E4D519E955221 /* ShelfStore.swift */; };
+		C6AB581E73BE42168544D841 /* ShelfItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D393CBAE8C047FFA319EC57 /* ShelfItem.swift */; };
+		B7D5C941FC13483B95AC9AFD /* ShelfDropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A86B811617B4295AA1068A3 /* ShelfDropView.swift */; };
+		DD71741F7D704EDA846BEC0C /* NowPlayingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A08CCBD608456C9F7FA44F /* NowPlayingService.swift */; };
+		CF2D51ED38AD4212A844FB2E /* MediaRemoteBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3AD179F1F6C4D55AAF5C8F0 /* MediaRemoteBridge.swift */; };
+		18440059317D450BA236110E /* PlaybackControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A829E8DF178439EA97ED365 /* PlaybackControls.swift */; };
+		294A95293D5E4639B34CE1B1 /* SystemVolumeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9683F65B850A49249BBE4CA3 /* SystemVolumeService.swift */; };
+		B5314500056A4376BB5540B3 /* Permissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB3ACCDD9954A859C270CE4 /* Permissions.swift */; };
+		F891285760CC44D69033F774 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790D9830299B4A5C9BADA617 /* Logging.swift */; };
+		000BBF7432F54632AE479AD2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 36ADFCA822054429AE84AAAE /* Assets.xcassets */; };
+		54D9540D45FD4DF5AEEDF065 /* ShelfStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615C06C864314E9C943B7D58 /* ShelfStoreTests.swift */; };
+		D0B41C334C9544BFA6D61BD5 /* SystemVolumeServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5980AC562A0A4AA0AB6B097A /* SystemVolumeServiceTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3E0D5C3469EF4324BF1B7979 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 382ECF49886246DBB4F4B369 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4E5C939ED27148C6B85AAFF0;
+			remoteInfo = DynamicIsland;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		34D7F438F056442E84524B92 /* DynamicIsland.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DynamicIsland.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7774045A5A664636A25735F2 /* DynamicIslandTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DynamicIslandTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		494D1B622A6B46DEB5A62D17 /* DynamicIslandApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicIslandApp.swift; sourceTree = "<group>"; };
+		26B172EC76F34BF98CAD12AB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		058EBA2BD5AF4ECABA09D927 /* IslandWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandWindowController.swift; sourceTree = "<group>"; };
+		965551AE2F174BCABDA7A7D8 /* IslandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandView.swift; sourceTree = "<group>"; };
+		B55A75EA05D34981B96D6FB8 /* IslandState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandState.swift; sourceTree = "<group>"; };
+		43D925DB415E4D519E955221 /* ShelfStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfStore.swift; sourceTree = "<group>"; };
+		4D393CBAE8C047FFA319EC57 /* ShelfItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfItem.swift; sourceTree = "<group>"; };
+		1A86B811617B4295AA1068A3 /* ShelfDropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfDropView.swift; sourceTree = "<group>"; };
+		E7A08CCBD608456C9F7FA44F /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
+		D3AD179F1F6C4D55AAF5C8F0 /* MediaRemoteBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaRemoteBridge.swift; sourceTree = "<group>"; };
+		8A829E8DF178439EA97ED365 /* PlaybackControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackControls.swift; sourceTree = "<group>"; };
+		9683F65B850A49249BBE4CA3 /* SystemVolumeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemVolumeService.swift; sourceTree = "<group>"; };
+		6BB3ACCDD9954A859C270CE4 /* Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permissions.swift; sourceTree = "<group>"; };
+		790D9830299B4A5C9BADA617 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
+		36ADFCA822054429AE84AAAE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		615C06C864314E9C943B7D58 /* ShelfStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfStoreTests.swift; sourceTree = "<group>"; };
+		5980AC562A0A4AA0AB6B097A /* SystemVolumeServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemVolumeServiceTests.swift; sourceTree = "<group>"; };
+		4F6D82FD4D114BEA9F02E104 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		56846A0C204F4CE48FFC9A78 /* DynamicIsland.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DynamicIsland.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FFC3DCC817244B589CAB8DC8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		150CFC032C944463A8533C14 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E8263EF58BD74125AA90CF8C = {
+			isa = PBXGroup;
+			children = (
+				E010EC40109D47CEA1887A53 /* Sources */,
+				B2FB6F11C69D418BA324D804 /* Resources */,
+				EA7AE40643B747C3837708E5 /* Tests */,
+				51A13FE4D54D411EA4D59FAF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		51A13FE4D54D411EA4D59FAF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				34D7F438F056442E84524B92 /* DynamicIsland.app */,
+				7774045A5A664636A25735F2 /* DynamicIslandTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E010EC40109D47CEA1887A53 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				02C93285091A4B1DB0D9187B /* App */,
+				D35895B5DD914B6EAB0D4FC1 /* Island */,
+				A6A280F9D0D24E10A50D099D /* Shelf */,
+				7CDE2F31444D4671948CB4CC /* Media */,
+				A68A91FF42EB45B6BF23A073 /* Volume */,
+				62230310FE91445189FE63D8 /* Support */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		02C93285091A4B1DB0D9187B /* App */ = {
+			isa = PBXGroup;
+			children = (
+				494D1B622A6B46DEB5A62D17 /* DynamicIslandApp.swift */,
+				26B172EC76F34BF98CAD12AB /* AppDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		D35895B5DD914B6EAB0D4FC1 /* Island */ = {
+			isa = PBXGroup;
+			children = (
+				058EBA2BD5AF4ECABA09D927 /* IslandWindowController.swift */,
+				965551AE2F174BCABDA7A7D8 /* IslandView.swift */,
+				B55A75EA05D34981B96D6FB8 /* IslandState.swift */,
+			);
+			path = Island;
+			sourceTree = "<group>";
+		};
+		A6A280F9D0D24E10A50D099D /* Shelf */ = {
+			isa = PBXGroup;
+			children = (
+				43D925DB415E4D519E955221 /* ShelfStore.swift */,
+				4D393CBAE8C047FFA319EC57 /* ShelfItem.swift */,
+				1A86B811617B4295AA1068A3 /* ShelfDropView.swift */,
+			);
+			path = Shelf;
+			sourceTree = "<group>";
+		};
+		7CDE2F31444D4671948CB4CC /* Media */ = {
+			isa = PBXGroup;
+			children = (
+				E7A08CCBD608456C9F7FA44F /* NowPlayingService.swift */,
+				D3AD179F1F6C4D55AAF5C8F0 /* MediaRemoteBridge.swift */,
+				8A829E8DF178439EA97ED365 /* PlaybackControls.swift */,
+			);
+			path = Media;
+			sourceTree = "<group>";
+		};
+		A68A91FF42EB45B6BF23A073 /* Volume */ = {
+			isa = PBXGroup;
+			children = (
+				9683F65B850A49249BBE4CA3 /* SystemVolumeService.swift */,
+			);
+			path = Volume;
+			sourceTree = "<group>";
+		};
+		62230310FE91445189FE63D8 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				6BB3ACCDD9954A859C270CE4 /* Permissions.swift */,
+				790D9830299B4A5C9BADA617 /* Logging.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		B2FB6F11C69D418BA324D804 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				36ADFCA822054429AE84AAAE /* Assets.xcassets */,
+				4F6D82FD4D114BEA9F02E104 /* Info.plist */,
+				56846A0C204F4CE48FFC9A78 /* DynamicIsland.entitlements */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		EA7AE40643B747C3837708E5 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				615C06C864314E9C943B7D58 /* ShelfStoreTests.swift */,
+				5980AC562A0A4AA0AB6B097A /* SystemVolumeServiceTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4E5C939ED27148C6B85AAFF0 /* DynamicIsland */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FE621D2CA7CD4D6FAAA10AC2 /* Build configuration list for PBXNativeTarget "DynamicIsland" */;
+			buildPhases = (
+				C2122884CB9C4B75AAD8A890 /* Sources */,
+				FFC3DCC817244B589CAB8DC8 /* Frameworks */,
+				33787B0CC61B4B04A3D083D7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DynamicIsland;
+			productName = DynamicIsland;
+			productReference = 34D7F438F056442E84524B92 /* DynamicIsland.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F0367AE87F7946819E4B5F48 /* DynamicIslandTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 73545C92025F4BB38DE39417 /* Build configuration list for PBXNativeTarget "DynamicIslandTests" */;
+			buildPhases = (
+				F9AE5EA6102844148E17CF22 /* Sources */,
+				150CFC032C944463A8533C14 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8660A1F6EA7A46F1ADA31E93 /* PBXTargetDependency */,
+			);
+			name = DynamicIslandTests;
+			productName = DynamicIslandTests;
+			productReference = 7774045A5A664636A25735F2 /* DynamicIslandTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		382ECF49886246DBB4F4B369 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					4E5C939ED27148C6B85AAFF0 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					F0367AE87F7946819E4B5F48 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = 4E5C939ED27148C6B85AAFF0;
+					};
+				};
+			};
+			buildConfigurationList = C47D2535E5B245A5B5FC40AC /* Build configuration list for PBXProject "DynamicIsland" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E8263EF58BD74125AA90CF8C;
+			productRefGroup = 51A13FE4D54D411EA4D59FAF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4E5C939ED27148C6B85AAFF0 /* DynamicIsland */,
+				F0367AE87F7946819E4B5F48 /* DynamicIslandTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		33787B0CC61B4B04A3D083D7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000BBF7432F54632AE479AD2 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C2122884CB9C4B75AAD8A890 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C55AA5F980004AB68078ACBE /* DynamicIslandApp.swift in Sources */,
+				54932E9C4B534CE88809B65E /* AppDelegate.swift in Sources */,
+				699B0E12B8B84AE3A065859E /* IslandWindowController.swift in Sources */,
+				25290FF5A83E415A82E0F5E8 /* IslandView.swift in Sources */,
+				5320531EEEBD4CB6A854D3C1 /* IslandState.swift in Sources */,
+				5F9BD25F56C84533A8D69C4C /* ShelfStore.swift in Sources */,
+				C6AB581E73BE42168544D841 /* ShelfItem.swift in Sources */,
+				B7D5C941FC13483B95AC9AFD /* ShelfDropView.swift in Sources */,
+				DD71741F7D704EDA846BEC0C /* NowPlayingService.swift in Sources */,
+				CF2D51ED38AD4212A844FB2E /* MediaRemoteBridge.swift in Sources */,
+				18440059317D450BA236110E /* PlaybackControls.swift in Sources */,
+				294A95293D5E4639B34CE1B1 /* SystemVolumeService.swift in Sources */,
+				B5314500056A4376BB5540B3 /* Permissions.swift in Sources */,
+				F891285760CC44D69033F774 /* Logging.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F9AE5EA6102844148E17CF22 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				54D9540D45FD4DF5AEEDF065 /* ShelfStoreTests.swift in Sources */,
+				D0B41C334C9544BFA6D61BD5 /* SystemVolumeServiceTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8660A1F6EA7A46F1ADA31E93 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4E5C939ED27148C6B85AAFF0 /* DynamicIsland */;
+			targetProxy = 3E0D5C3469EF4324BF1B7979 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		59C860E9ADB4412FBAF54B94 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		C043C97DC9524586BDC8D3D1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		48FA46B6C570463282502F83 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Resources/DynamicIsland.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hashir.DynamicIsland;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		DEC436CF4AAA41B2B4CF9544 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Resources/DynamicIsland.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hashir.DynamicIsland;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		B95AF26917CF472483E1AE6C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hashir.DynamicIslandTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DynamicIsland.app/Contents/MacOS/DynamicIsland";
+			};
+			name = Debug;
+		};
+		920880A5B28D4373B2FA5DB5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hashir.DynamicIslandTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DynamicIsland.app/Contents/MacOS/DynamicIsland";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C47D2535E5B245A5B5FC40AC /* Build configuration list for PBXProject "DynamicIsland" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				59C860E9ADB4412FBAF54B94 /* Debug */,
+				C043C97DC9524586BDC8D3D1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FE621D2CA7CD4D6FAAA10AC2 /* Build configuration list for PBXNativeTarget "DynamicIsland" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				48FA46B6C570463282502F83 /* Debug */,
+				DEC436CF4AAA41B2B4CF9544 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		73545C92025F4BB38DE39417 /* Build configuration list for PBXNativeTarget "DynamicIslandTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B95AF26917CF472483E1AE6C /* Debug */,
+				920880A5B28D4373B2FA5DB5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 382ECF49886246DBB4F4B369 /* Project object */;
+}
