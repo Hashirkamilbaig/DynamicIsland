@@ -15,8 +15,8 @@ enum IslandLayout {
     static let artSize: CGFloat = 92
 
     /// Notch sensor while tucked.
-    static let notchHitWidth: CGFloat = 90
-    static let notchHitHeight: CGFloat = 11
+    static let notchHitWidth: CGFloat = 22.5
+    static let notchHitHeight: CGFloat = 2.75
     /// Pull chrome upward so it sits under the notch when tucked.
     static let tuckedOffsetY: CGFloat = -islandHeight
 }
