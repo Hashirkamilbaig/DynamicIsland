@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		ADCB29AD13EC415BAF21B561 /* ArtworkLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7132DCC3316A4D3C995B7881 /* ArtworkLoader.swift */; };
+		5E1A7C2D9B3F4E6A8C0D1F51 /* PlayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1A7C2D9B3F4E6A8C0D1F52 /* PlayMode.swift */; };
 		C43B5381CC34433CA73EE17A /* NSScreen+Notch.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF722AFC90C54060A07CC98B /* NSScreen+Notch.swift */; };
 		0A326D305EB0492F9D8E9842 /* IslandLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818F014C9ECD4339865D1ED5 /* IslandLayout.swift */; };
 		5E1A7C2D9B3F4E6A8C0D1F21 /* MarqueeText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1A7C2D9B3F4E6A8C0D1F22 /* MarqueeText.swift */; };
@@ -29,6 +30,7 @@
 		F891285760CC44D69033F774 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790D9830299B4A5C9BADA617 /* Logging.swift */; };
 		000BBF7432F54632AE479AD2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 36ADFCA822054429AE84AAAE /* Assets.xcassets */; };
 		54D9540D45FD4DF5AEEDF065 /* ShelfStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615C06C864314E9C943B7D58 /* ShelfStoreTests.swift */; };
+		5E1A7C2D9B3F4E6A8C0D1F61 /* PlayModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1A7C2D9B3F4E6A8C0D1F62 /* PlayModeTests.swift */; };
 		D0B41C334C9544BFA6D61BD5 /* SystemVolumeServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5980AC562A0A4AA0AB6B097A /* SystemVolumeServiceTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +46,7 @@
 
 /* Begin PBXFileReference section */
 		7132DCC3316A4D3C995B7881 /* ArtworkLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkLoader.swift; sourceTree = "<group>"; };
+		5E1A7C2D9B3F4E6A8C0D1F52 /* PlayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayMode.swift; sourceTree = "<group>"; };
 		BF722AFC90C54060A07CC98B /* NSScreen+Notch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+Notch.swift"; sourceTree = "<group>"; };
 		34D7F438F056442E84524B92 /* DynamicIsland.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DynamicIsland.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7774045A5A664636A25735F2 /* DynamicIslandTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DynamicIslandTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -67,6 +70,7 @@
 		790D9830299B4A5C9BADA617 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		36ADFCA822054429AE84AAAE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		615C06C864314E9C943B7D58 /* ShelfStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfStoreTests.swift; sourceTree = "<group>"; };
+		5E1A7C2D9B3F4E6A8C0D1F62 /* PlayModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayModeTests.swift; sourceTree = "<group>"; };
 		5980AC562A0A4AA0AB6B097A /* SystemVolumeServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemVolumeServiceTests.swift; sourceTree = "<group>"; };
 		4F6D82FD4D114BEA9F02E104 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		56846A0C204F4CE48FFC9A78 /* DynamicIsland.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DynamicIsland.entitlements; sourceTree = "<group>"; };
@@ -161,6 +165,7 @@
 			children = (
 				E7A08CCBD608456C9F7FA44F /* NowPlayingService.swift */,
 				7132DCC3316A4D3C995B7881 /* ArtworkLoader.swift */,
+				5E1A7C2D9B3F4E6A8C0D1F52 /* PlayMode.swift */,
 				D3AD179F1F6C4D55AAF5C8F0 /* MediaRemoteBridge.swift */,
 				8A829E8DF178439EA97ED365 /* PlaybackControls.swift */,
 			);
@@ -198,6 +203,7 @@
 			isa = PBXGroup;
 			children = (
 				615C06C864314E9C943B7D58 /* ShelfStoreTests.swift */,
+				5E1A7C2D9B3F4E6A8C0D1F62 /* PlayModeTests.swift */,
 				5980AC562A0A4AA0AB6B097A /* SystemVolumeServiceTests.swift */,
 			);
 			path = Tests;
@@ -309,6 +315,7 @@
 				B7D5C941FC13483B95AC9AFD /* ShelfDropView.swift in Sources */,
 				DD71741F7D704EDA846BEC0C /* NowPlayingService.swift in Sources */,
 				ADCB29AD13EC415BAF21B561 /* ArtworkLoader.swift in Sources */,
+				5E1A7C2D9B3F4E6A8C0D1F51 /* PlayMode.swift in Sources */,
 				CF2D51ED38AD4212A844FB2E /* MediaRemoteBridge.swift in Sources */,
 				18440059317D450BA236110E /* PlaybackControls.swift in Sources */,
 				294A95293D5E4639B34CE1B1 /* SystemVolumeService.swift in Sources */,
@@ -322,6 +329,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				54D9540D45FD4DF5AEEDF065 /* ShelfStoreTests.swift in Sources */,
+				5E1A7C2D9B3F4E6A8C0D1F61 /* PlayModeTests.swift in Sources */,
 				D0B41C334C9544BFA6D61BD5 /* SystemVolumeServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

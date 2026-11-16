@@ -3,6 +3,9 @@ import AppKit
 
 struct IslandView: View {
     @ObservedObject var state: IslandState
+    @State private var newSongsPulse = 0
+    @State private var newSongsArmed = false
+    @State private var newSongsTrack = ""
 
     private var isRevealed: Bool { state.isRevealed }
 
@@ -169,17 +172,71 @@ struct IslandView: View {
 
     private var playbackControls: some View {
         HStack(spacing: 0) {
-            transportButton("backward.fill", size: 18) { state.nowPlaying.previousTrack() }
+            playModeButton
             Spacer(minLength: 0)
-            transportButton(info.isPlaying ? "pause.fill" : "play.fill", size: 24) {
+            transportButton("backward.fill", size: 16) { state.nowPlaying.previousTrack() }
+            Spacer(minLength: 0)
+            transportButton(info.isPlaying ? "pause.fill" : "play.fill", size: 22) {
                 state.nowPlaying.togglePlayPause()
             }
             Spacer(minLength: 0)
-            transportButton("forward.fill", size: 18) { state.nowPlaying.nextTrack() }
+            transportButton("forward.fill", size: 16) { state.nowPlaying.nextTrack() }
+            Spacer(minLength: 0)
+            newSongsButton
         }
         .padding(.horizontal, -8)
         .foregroundStyle(.white.opacity(0.75))
     }
+
+    private var isSpotify: Bool { info.bundleIdentifier == "com.spotify.client" && info.hasTrack }
+
+    private var playModeButton: some View {
+        let mode = info.playMode
+        return Button { state.nowPlaying.cyclePlayMode() } label: {
+            Image(systemName: mode.symbol)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(mode == .off ? Color.white.opacity(0.4) : Self.spotifyGreen)
+                .overlay(alignment: .bottom) {
+                    Circle()
+                        .fill(Self.spotifyGreen)
+                        .frame(width: 3, height: 3)
+                        .offset(y: 7)
+                        .opacity(mode == .off ? 0 : 1)
+                }
+                .frame(width: 30, height: 34)
+                .contentShape(Rectangle())
+                .contentTransition(.symbolEffect(.replace))
+        }
+        .buttonStyle(TransportButtonStyle())
+        .disabled(!isSpotify)
+        .help(mode.label)
+    }
+
+    private var newSongsButton: some View {
+        Button {
+            state.nowPlaying.playNewSongsAfterThis()
+            newSongsPulse += 1
+        } label: {
+            Image(systemName: "sparkles")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(newSongsArmed ? Self.spotifyGreen : Color.white.opacity(0.4))
+                .symbolEffect(.bounce, value: newSongsPulse)
+                .frame(width: 30, height: 34)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(TransportButtonStyle())
+        .disabled(!isSpotify)
+        .help("Play new songs after this one")
+        .onChange(of: newSongsPulse) { _, _ in
+            newSongsArmed = true
+            newSongsTrack = info.title
+        }
+        .onChange(of: info.title) { _, title in
+            if title != newSongsTrack { newSongsArmed = false }
+        }
+    }
+
+    private static let spotifyGreen = Color(red: 0.12, green: 0.84, blue: 0.38)
 
     private func transportButton(_ symbol: String, size: CGFloat, action: @escaping () -> Void) -> some View {
         Button(action: action) {

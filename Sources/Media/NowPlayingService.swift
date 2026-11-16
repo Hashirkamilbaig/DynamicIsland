@@ -15,6 +15,10 @@ struct NowPlayingInfo: Equatable {
     var position: TimeInterval = 0
     var duration: TimeInterval = 0
     var positionDate = Date()
+    var shuffling = false
+    var repeating = false
+
+    var playMode: PlayMode { PlayMode(shuffling: shuffling, repeating: repeating) }
 
     enum Source: String, Equatable {
         case none
@@ -41,6 +45,8 @@ struct NowPlayingInfo: Equatable {
             && lhs.artworkURL == rhs.artworkURL
             && lhs.position == rhs.position
             && lhs.duration == rhs.duration
+            && lhs.shuffling == rhs.shuffling
+            && lhs.repeating == rhs.repeating
             && (lhs.artwork == nil) == (rhs.artwork == nil)
     }
 }
@@ -55,6 +61,7 @@ final class NowPlayingService: ObservableObject {
     /// Refreshes that land right after a tap can still report the old state; keep the
     /// optimistic play/pause value until the player has had time to catch up.
     private var optimisticPlayStateUntil = Date.distantPast
+    private var optimisticModeUntil = Date.distantPast
     private let artworkLoader = ArtworkLoader()
 
     func start() {
@@ -77,6 +84,26 @@ final class NowPlayingService: ObservableObject {
         info.isPlaying.toggle()
         optimisticPlayStateUntil = Date().addingTimeInterval(0.8)
         PlaybackControls.togglePlayPause()
+        scheduleReconcile()
+    }
+
+    func cyclePlayMode() {
+        let next = info.playMode.next
+        info.shuffling = next.shuffling
+        info.repeating = next.repeating
+        optimisticModeUntil = Date().addingTimeInterval(1.5)
+        PlaybackControls.setPlayMode(next)
+        scheduleReconcile()
+    }
+
+    /// Restarts the current song outside its playlist so it's the last thing
+    /// queued; when it ends, Spotify's Autoplay continues with new related songs.
+    func playNewSongsAfterThis() {
+        guard info.bundleIdentifier == "com.spotify.client", info.hasTrack else { return }
+        info.shuffling = false
+        info.repeating = false
+        optimisticModeUntil = Date().addingTimeInterval(1.5)
+        PlaybackControls.continueWithAutoplay()
         scheduleReconcile()
     }
 
@@ -200,6 +227,10 @@ final class NowPlayingService: ObservableObject {
         if Date() < optimisticPlayStateUntil {
             next.isPlaying = info.isPlaying
         }
+        if Date() < optimisticModeUntil {
+            next.shuffling = info.shuffling
+            next.repeating = info.repeating
+        }
         if next.artwork == nil, let url = next.artworkURL {
             if let cached = artworkLoader.cachedImage(for: url) {
                 next.artwork = cached
@@ -228,7 +259,9 @@ final class NowPlayingService: ObservableObject {
           set art to artwork url of current track
           set pos to (player position * 1000) as integer
           set dur to duration of current track
-          return t & "|||" & a & "|||" & al & "|||" & playingState & "|||" & art & "|||" & pos & "|||" & dur
+          set shuf to shuffling as string
+          set rep to repeating as string
+          return t & "|||" & a & "|||" & al & "|||" & playingState & "|||" & art & "|||" & pos & "|||" & dur & "|||" & shuf & "|||" & rep
         end tell
         """
         var error: NSDictionary?
@@ -254,7 +287,9 @@ final class NowPlayingService: ObservableObject {
             bundleIdentifier: "com.spotify.client",
             source: .spotifyScript,
             position: parts.count > 5 ? (Double(parts[5]) ?? 0) / 1000 : 0,
-            duration: parts.count > 6 ? (Double(parts[6]) ?? 0) / 1000 : 0
+            duration: parts.count > 6 ? (Double(parts[6]) ?? 0) / 1000 : 0,
+            shuffling: parts.count > 7 && parts[7] == "true",
+            repeating: parts.count > 8 && parts[8] == "true"
         )
     }
 }
