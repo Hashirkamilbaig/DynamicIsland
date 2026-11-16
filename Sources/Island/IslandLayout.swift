@@ -14,9 +14,9 @@ enum IslandLayout {
     static let bottomCornerRadius: CGFloat = 42
     static let artSize: CGFloat = 92
 
-    /// Notch sensor while tucked (generous so file drags are easy to land).
-    static let notchHitWidth: CGFloat = 360
-    static let notchHitHeight: CGFloat = 44
+    /// Notch sensor while tucked.
+    static let notchHitWidth: CGFloat = 180
+    static let notchHitHeight: CGFloat = 22
     /// Pull chrome upward so it sits under the notch when tucked.
     static let tuckedOffsetY: CGFloat = -islandHeight
 }
