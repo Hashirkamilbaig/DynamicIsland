@@ -76,24 +76,21 @@ struct IslandView: View {
                 artwork
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(state.nowPlaying.info.hasTrack ? state.nowPlaying.info.title : "Nothing playing")
+                    MarqueeText(text: state.nowPlaying.info.hasTrack ? state.nowPlaying.info.title : "Nothing playing", isActive: isRevealed)
                         .font(.system(size: 22, weight: .bold))
                         .foregroundStyle(.white)
-                        .lineLimit(1)
 
                     if state.nowPlaying.info.hasTrack {
                         if !state.nowPlaying.info.album.isEmpty {
-                            Text(state.nowPlaying.info.album.uppercased())
+                            MarqueeText(text: state.nowPlaying.info.album.uppercased(), isActive: isRevealed)
                                 .font(.system(size: 11, weight: .semibold))
                                 .tracking(0.6)
                                 .foregroundStyle(.white.opacity(0.85))
-                                .lineLimit(1)
                         }
 
-                        Text(state.nowPlaying.info.artist)
+                        MarqueeText(text: state.nowPlaying.info.artist, isActive: isRevealed)
                             .font(.system(size: 12, weight: .medium))
                             .foregroundStyle(.white.opacity(0.55))
-                            .lineLimit(1)
                     } else {
                         Text("Play something in Spotify or Music")
                             .font(.system(size: 12, weight: .medium))
@@ -104,8 +101,7 @@ struct IslandView: View {
                     playbackControls
                         .padding(.top, 4)
                 }
-
-                Spacer(minLength: 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
                 ShelfDropView(store: state.shelf)
                     .frame(width: IslandLayout.shelfWidth, height: IslandLayout.artSize)
