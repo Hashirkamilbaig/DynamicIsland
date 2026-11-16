@@ -1,9 +1,15 @@
 # Dynamic Island (macOS)
 
+<p align="center">
+  <img src="docs/media/demo-preview.gif" alt="Dynamic Island opening from the Mac notch and holding a dropped file" width="640">
+  <br>
+  <a href="docs/media/dynamic-island-demo.mp4">Watch the full 36-second demo (MP4)</a>
+</p>
+
 Floating island that stays tucked under the Mac notch until the pointer enters the notch region. When revealed it hugs the top of the screen so the black body blends with the hardware notch, with:
 
 1. **File shelf** — drop files in, drag them out for ~1 minute, then they auto-purge
-2. **Now Playing** — title / artist / artwork plus play, pause, next, previous
+2. **Now Playing** — title / artist / artwork, play, pause, next, previous, and a scrubbable progress bar
 3. **System volume** — Mac output-device volume (Core Audio), not Spotify’s in-app volume
 
 Native Swift + SwiftUI. No Electron.
