@@ -36,9 +36,12 @@ struct NowPlayingInfo: Equatable {
 final class NowPlayingService: ObservableObject {
     @Published private(set) var info = NowPlayingInfo()
 
-    private var observers: [NSObjectProtocol] = []
+    private var observers: [(center: NotificationCenter, token: NSObjectProtocol)] = []
     private var pollTimer: Timer?
     private var usingFallback = false
+    /// Refreshes that land right after a tap can still report the old state; keep the
+    /// optimistic play/pause value until the player has had time to catch up.
+    private var optimisticPlayStateUntil = Date.distantPast
 
     func start() {
         if MediaRemoteBridge.isAvailable {
@@ -53,8 +56,33 @@ final class NowPlayingService: ObservableObject {
         }
     }
 
+    func togglePlayPause() {
+        info.isPlaying.toggle()
+        optimisticPlayStateUntil = Date().addingTimeInterval(0.8)
+        PlaybackControls.togglePlayPause()
+        scheduleReconcile()
+    }
+
+    func nextTrack() {
+        PlaybackControls.nextTrack()
+        scheduleReconcile()
+    }
+
+    func previousTrack() {
+        PlaybackControls.previousTrack()
+        scheduleReconcile()
+    }
+
+    private func scheduleReconcile() {
+        for delay in [0.3, 0.9] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                self?.refresh()
+            }
+        }
+    }
+
     func stop() {
-        observers.forEach { NotificationCenter.default.removeObserver($0) }
+        observers.forEach { $0.center.removeObserver($0.token) }
         observers.removeAll()
         pollTimer?.invalidate()
         pollTimer = nil
@@ -71,19 +99,23 @@ final class NowPlayingService: ObservableObject {
     // MARK: - MediaRemote
 
     private func installMediaRemoteObservers() {
-        let center = DistributedNotificationCenter.default()
         let names: [Notification.Name] = [
             .mediaRemoteNowPlayingInfoDidChange,
             .mediaRemoteNowPlayingApplicationIsPlayingDidChange,
             .mediaRemoteNowPlayingApplicationDidChange
         ]
-        for name in names {
-            let token = center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
-                Task { @MainActor in
-                    self?.refreshFromMediaRemote()
+        // MediaRemote posts to the in-process center after registration; keep the
+        // distributed center too in case a given OS build uses it.
+        let centers: [NotificationCenter] = [.default, DistributedNotificationCenter.default()]
+        for center in centers {
+            for name in names {
+                let token = center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                    Task { @MainActor in
+                        self?.refreshFromMediaRemote()
+                    }
                 }
+                observers.append((center, token))
             }
-            observers.append(token)
         }
 
         // Soft poll in case some OS builds drop notifications.
@@ -116,7 +148,7 @@ final class NowPlayingService: ObservableObject {
                         next = scripted
                     }
                 }
-                self.info = next
+                self.apply(next)
             }
         }
     }
@@ -136,11 +168,15 @@ final class NowPlayingService: ObservableObject {
     }
 
     private func refreshFromSpotifyScript() {
-        if let scripted = Self.spotifyNowPlayingViaAppleScript() {
-            info = scripted
-        } else {
-            info = NowPlayingInfo(source: .spotifyScript)
+        apply(Self.spotifyNowPlayingViaAppleScript() ?? NowPlayingInfo(source: .spotifyScript))
+    }
+
+    private func apply(_ next: NowPlayingInfo) {
+        var next = next
+        if Date() < optimisticPlayStateUntil {
+            next.isPlaying = info.isPlaying
         }
+        info = next
     }
 
     static func spotifyNowPlayingViaAppleScript() -> NowPlayingInfo? {

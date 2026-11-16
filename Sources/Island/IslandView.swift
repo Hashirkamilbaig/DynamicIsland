@@ -203,14 +203,14 @@ struct IslandView: View {
 
     private var playbackControls: some View {
         HStack(spacing: 18) {
-            Button { PlaybackControls.previousTrack() } label: {
+            Button { state.nowPlaying.previousTrack() } label: {
                 Image(systemName: "backward.fill")
             }
-            Button { PlaybackControls.togglePlayPause() } label: {
+            Button { state.nowPlaying.togglePlayPause() } label: {
                 Image(systemName: state.nowPlaying.info.isPlaying ? "pause.fill" : "play.fill")
                     .frame(width: 16)
             }
-            Button { PlaybackControls.nextTrack() } label: {
+            Button { state.nowPlaying.nextTrack() } label: {
                 Image(systemName: "forward.fill")
             }
         }
