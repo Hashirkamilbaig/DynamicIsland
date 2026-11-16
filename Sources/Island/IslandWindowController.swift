@@ -18,41 +18,31 @@ final class IslandWindowController {
         if panel == nil {
             createPanel()
         }
-        applyPresenceLayout(animated: false)
+        // Panel stays at full revealed size; only the SwiftUI chrome slides.
+        applyFullSizeFrame()
         panel?.orderFrontRegardless()
         startNotchMouseMonitor()
         Log.window.info("Island panel shown (tucked under notch)")
     }
 
-    func applyPresenceLayout(animated: Bool) {
-        guard let panel, let screen = NSScreen.main else { return }
-        let frame = frameOnScreen(screen, revealed: state.isRevealed)
-        if animated {
-            NSAnimationContext.runAnimationGroup { context in
-                context.duration = 0.28
-                context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-                panel.animator().setFrame(frame, display: true)
-            }
-        } else {
-            panel.setFrame(frame, display: true)
-        }
-    }
-
     func reposition() {
-        applyPresenceLayout(animated: false)
+        applyFullSizeFrame()
     }
 
+    /// Kept for AppDelegate wiring; panel size no longer changes with presence.
     func updateSizeForExpansion() {
-        applyPresenceLayout(animated: true)
+        applyFullSizeFrame()
     }
 
-    private func frameOnScreen(_ screen: NSScreen, revealed: Bool) -> NSRect {
-        // Full screen frame includes the menu-bar / notch band (visibleFrame does not).
+    private func applyFullSizeFrame() {
+        guard let panel, let screen = NSScreen.main else { return }
+        panel.setFrame(fullFrame(on: screen), display: true)
+    }
+
+    private func fullFrame(on screen: NSScreen) -> NSRect {
         let screenFrame = screen.frame
         let width = IslandLayout.panelWidth
-        // Revealed panel is taller than the island so the soft shadow below is not clipped;
-        // the island itself is top-aligned and flush with screen.maxY.
-        let height = revealed ? IslandLayout.revealedPanelHeight : IslandLayout.notchHitHeight
+        let height = IslandLayout.revealedPanelHeight
         let x = screenFrame.midX - width / 2
         let y = screenFrame.maxY - height
         return NSRect(x: x, y: y, width: width, height: height)
@@ -60,7 +50,7 @@ final class IslandWindowController {
 
     private func createPanel() {
         let view = IslandView(state: state)
-        let initial = frameOnScreen(NSScreen.main ?? NSScreen.screens[0], revealed: false)
+        let initial = fullFrame(on: NSScreen.main ?? NSScreen.screens[0])
         let hostingView = IslandHostingView(rootView: view, state: state)
         hostingView.frame = NSRect(origin: .zero, size: initial.size)
         hostingView.autoresizingMask = [.width, .height]
@@ -73,7 +63,6 @@ final class IslandWindowController {
         )
         panel.contentView = hostingView
         panel.isFloatingPanel = true
-        // Above the menu bar so the notch hit target receives mouse/drag events.
         panel.level = .statusBar
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
         panel.isOpaque = false
@@ -93,8 +82,8 @@ final class IslandWindowController {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            Task { @MainActor in
-                self?.applyPresenceLayout(animated: false)
+            DispatchQueue.main.async {
+                self?.applyFullSizeFrame()
             }
         }
     }
@@ -102,15 +91,19 @@ final class IslandWindowController {
     private func startNotchMouseMonitor() {
         guard globalMouseMonitor == nil else { return }
 
+        // Global: other apps (Finder drag). Hop to main, then just reveal if inside.
         globalMouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged]) { [weak self] _ in
-            Task { @MainActor in
+            DispatchQueue.main.async {
                 self?.evaluatePointerOverNotch()
             }
         }
 
+        // Local: already on the app’s event stream; call directly when possible.
         localMouseMonitor = NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged]) { [weak self] event in
-            Task { @MainActor in
+            if Thread.isMainThread {
                 self?.evaluatePointerOverNotch()
+            } else {
+                DispatchQueue.main.async { self?.evaluatePointerOverNotch() }
             }
             return event
         }
@@ -119,45 +112,28 @@ final class IslandWindowController {
     private func evaluatePointerOverNotch() {
         guard let screen = NSScreen.main else { return }
         let mouse = NSEvent.mouseLocation
+        let inside = activeHitZone(on: screen).contains(mouse)
+        // One rule: in the zone → reveal. Hover and file-drag use the same path.
+        state.setPointerInside(inside, reason: inside ? "hit-zone" : "left-zone")
+    }
 
-        // While revealed, the interactive zone is the island body (not the shadow padding alone).
-        let zone: NSRect
+    private func activeHitZone(on screen: NSScreen) -> NSRect {
         if state.isRevealed, let panel {
-            // Island is top-aligned inside the panel; ignore bottom shadow padding for hit-testing.
             let body = NSRect(
                 x: panel.frame.midX - IslandLayout.islandWidth / 2,
                 y: panel.frame.maxY - IslandLayout.islandHeight,
                 width: IslandLayout.islandWidth,
                 height: IslandLayout.islandHeight
             )
-            zone = body.insetBy(dx: -6, dy: -6)
-        } else {
-            zone = notchHitBand(on: screen)
+            return body.insetBy(dx: -8, dy: -8)
         }
-
-        let inside = zone.contains(mouse)
-        let dragInProgress = NSEvent.pressedMouseButtons != 0
-
-        if inside {
-            if dragInProgress {
-                state.handleDragTargeted(true)
-            } else {
-                state.handleHover(true)
-            }
-        } else {
-            if state.isHovering {
-                state.handleHover(false)
-            }
-            if state.isDragTargeted {
-                state.handleDragTargeted(false)
-            }
-        }
+        return notchHitBand(on: screen)
     }
 
     private func notchHitBand(on screen: NSScreen) -> NSRect {
         let screenFrame = screen.frame
         let width = IslandLayout.notchHitWidth
-        let height = max(IslandLayout.notchHitHeight, screen.safeAreaInsets.top + 4)
+        let height = max(IslandLayout.notchHitHeight, screen.safeAreaInsets.top + 8)
         return NSRect(
             x: screenFrame.midX - width / 2,
             y: screenFrame.maxY - height,
@@ -172,7 +148,8 @@ final class IslandPanel: NSPanel {
     override var canBecomeMain: Bool { false }
 }
 
-/// AppKit drop destination so Finder drags reveal the tucked island and land on the shelf.
+/// Full-size hosting view: click-through outside the active hit zone while tucked,
+/// and AppKit drop targeting so Finder drags reveal + shelf ingest.
 final class IslandHostingView<Content: View>: NSHostingView<Content> {
     private weak var state: IslandState?
 
@@ -193,24 +170,42 @@ final class IslandHostingView<Content: View>: NSHostingView<Content> {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
-        Task { @MainActor in
-            state?.handleDragTargeted(true)
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        // While tucked, only the top notch strip intercepts mouse/drags so the
+        // always-full-size panel does not block the desktop below.
+        guard let state else { return super.hitTest(point) }
+        let zone = hitZoneInViewCoordinates(revealed: state.isRevealed)
+        guard zone.contains(point) else { return nil }
+        return super.hitTest(point)
+    }
+
+    private func hitZoneInViewCoordinates(revealed: Bool) -> NSRect {
+        let bounds = self.bounds
+        if revealed {
+            let x = (bounds.width - IslandLayout.islandWidth) / 2
+            let y = bounds.height - IslandLayout.islandHeight
+            return NSRect(x: x, y: y, width: IslandLayout.islandWidth, height: IslandLayout.islandHeight)
+                .insetBy(dx: -8, dy: -8)
         }
+        let width = IslandLayout.notchHitWidth
+        let height = IslandLayout.notchHitHeight
+        let x = (bounds.width - width) / 2
+        let y = bounds.height - height
+        return NSRect(x: x, y: y, width: width, height: height)
+    }
+
+    override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+        state?.setPointerInside(true, reason: "drag-enter")
         return canAccept(sender) ? .copy : []
     }
 
     override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
-        Task { @MainActor in
-            state?.handleDragTargeted(true)
-        }
+        state?.setPointerInside(true, reason: "drag-update")
         return canAccept(sender) ? .copy : []
     }
 
     override func draggingExited(_ sender: NSDraggingInfo?) {
-        Task { @MainActor in
-            state?.handleDragTargeted(false)
-        }
+        state?.setPointerInside(false, reason: "drag-exit")
     }
 
     override func prepareForDragOperation(_ sender: NSDraggingInfo) -> Bool {
@@ -221,23 +216,18 @@ final class IslandHostingView<Content: View>: NSHostingView<Content> {
         guard let urls = sender.draggingPasteboard.readObjects(forClasses: [NSURL.self], options: [
             .urlReadingFileURLsOnly: true
         ]) as? [URL], !urls.isEmpty else {
-            Task { @MainActor in
-                state?.handleDragTargeted(false)
-            }
+            state?.setPointerInside(false, reason: "drag-failed")
             return false
         }
-        Task { @MainActor in
-            state?.reveal(reason: "appkit-drop")
-            state?.shelf.ingest(urls: urls)
-            state?.handleDragTargeted(false)
-        }
+        state?.reveal(reason: "appkit-drop")
+        state?.shelf.ingest(urls: urls)
+        // Keep revealed while the cursor is still over us; mouse monitor will tuck on leave.
+        state?.setPointerInside(true, reason: "drag-drop")
         return true
     }
 
     override func concludeDragOperation(_ sender: NSDraggingInfo?) {
-        Task { @MainActor in
-            state?.handleDragTargeted(false)
-        }
+        // Do not force-tuck here; pointer may still be over the island.
     }
 
     private func canAccept(_ sender: NSDraggingInfo) -> Bool {

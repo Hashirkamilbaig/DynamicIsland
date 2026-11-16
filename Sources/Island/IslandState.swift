@@ -10,9 +10,9 @@ final class IslandState: ObservableObject {
         case revealed
     }
 
-    @Published var presence: Presence = .tucked
-    @Published var isHovering = false
-    @Published var isDragTargeted = false
+    @Published private(set) var presence: Presence = .tucked
+    /// True while the cursor (or an active file drag) is inside the island hit zone.
+    @Published private(set) var isPointerInside = false
 
     let shelf: ShelfStore
     let nowPlaying: NowPlayingService
@@ -59,48 +59,37 @@ final class IslandState: ObservableObject {
         volume.refresh()
     }
 
-    /// Bring the island out from under the notch.
+    /// Single rule: pointer in the hit zone → always reveal. Leave → tuck after a short delay.
+    func setPointerInside(_ inside: Bool, reason: String) {
+        isPointerInside = inside
+        if inside {
+            reveal(reason: reason)
+        } else {
+            scheduleTuckIfIdle(after: 0.25)
+        }
+    }
+
     func reveal(reason: String) {
         tuckWorkItem?.cancel()
-        if presence != .revealed {
-            Log.window.debug("Reveal (\(reason, privacy: .public))")
-        }
+        guard presence != .revealed else { return }
+        Log.window.debug("Reveal (\(reason, privacy: .public))")
         presence = .revealed
     }
 
-    /// Park the island back under the notch.
     func tuck(reason: String) {
         tuckWorkItem?.cancel()
-        if presence != .tucked {
-            Log.window.debug("Tuck (\(reason, privacy: .public))")
-        }
+        guard presence != .tucked else { return }
+        Log.window.debug("Tuck (\(reason, privacy: .public))")
         presence = .tucked
     }
 
     /// Menu-bar helper only. Clicks on the island itself must not dismiss.
     func toggleFromMenu() {
         if isRevealed {
+            isPointerInside = false
             tuck(reason: "menu")
         } else {
             reveal(reason: "menu")
-        }
-    }
-
-    func handleHover(_ hovering: Bool) {
-        isHovering = hovering
-        if hovering {
-            reveal(reason: "hover")
-        } else {
-            scheduleTuckIfIdle(after: 0.35)
-        }
-    }
-
-    func handleDragTargeted(_ targeted: Bool) {
-        isDragTargeted = targeted
-        if targeted {
-            reveal(reason: "drag")
-        } else {
-            scheduleTuckIfIdle(after: 0.45)
         }
     }
 
@@ -108,8 +97,7 @@ final class IslandState: ObservableObject {
         tuckWorkItem?.cancel()
         let work = DispatchWorkItem { [weak self] in
             guard let self else { return }
-            // Stay out while the pointer or an active file drag is over the island.
-            if !self.isHovering, !self.isDragTargeted {
+            if !self.isPointerInside {
                 self.tuck(reason: "pointer-left")
             }
         }

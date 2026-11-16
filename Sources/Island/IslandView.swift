@@ -20,14 +20,17 @@ struct IslandView: View {
                 .opacity(isRevealed ? 1 : 0.001)
                 .allowsHitTesting(isRevealed)
         }
+        // Panel is always full-size; only the chrome offset animates for reveal/tuck.
         .frame(
             width: IslandLayout.panelWidth,
-            height: isRevealed ? IslandLayout.revealedPanelHeight : IslandLayout.notchHitHeight,
+            height: IslandLayout.revealedPanelHeight,
             alignment: .top
         )
-        .animation(.spring(response: 0.34, dampingFraction: 0.86), value: state.presence)
+        .animation(.spring(response: 0.32, dampingFraction: 0.88), value: state.presence)
         .animation(.easeOut(duration: 0.18), value: showShelf)
-        .onHover { state.handleHover($0) }
+        .onHover { hovering in
+            state.setPointerInside(hovering, reason: hovering ? "swiftui-hover" : "swiftui-hover-exit")
+        }
         // Clicks do not dismiss. Drops are handled by IslandHostingView (AppKit).
     }
 
