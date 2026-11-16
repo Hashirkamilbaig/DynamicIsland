@@ -29,9 +29,21 @@ final class IslandWindowController {
         applyFullSizeFrame()
     }
 
-    /// Kept for AppDelegate wiring; panel size no longer changes with presence.
+    /// Called on every presence change.
     func updateSizeForExpansion() {
         applyFullSizeFrame()
+        updateMousePassthrough()
+    }
+
+    /// The panel is always full-size for the animation, so let clicks fall through to
+    /// whatever is underneath unless the cursor is over the open island. Hover/drag
+    /// detection while tucked comes from the global mouse monitor, which still fires.
+    private func updateMousePassthrough() {
+        guard let panel, let screen = NSScreen.main else { return }
+        let overIsland = state.isRevealed && activeHitZone(on: screen).contains(NSEvent.mouseLocation)
+        if panel.ignoresMouseEvents == overIsland {
+            panel.ignoresMouseEvents = !overIsland
+        }
     }
 
     private func applyFullSizeFrame() {
@@ -71,7 +83,7 @@ final class IslandWindowController {
         panel.hidesOnDeactivate = false
         panel.becomesKeyOnlyIfNeeded = true
         panel.isMovableByWindowBackground = false
-        panel.ignoresMouseEvents = false
+        panel.ignoresMouseEvents = true
         panel.animationBehavior = .utilityWindow
 
         self.hosting = hostingView
@@ -115,6 +127,7 @@ final class IslandWindowController {
         let inside = activeHitZone(on: screen).contains(mouse)
         // One rule: in the zone → reveal. Hover and file-drag use the same path.
         state.setPointerInside(inside, reason: inside ? "hit-zone" : "left-zone")
+        updateMousePassthrough()
     }
 
     private func activeHitZone(on screen: NSScreen) -> NSRect {
