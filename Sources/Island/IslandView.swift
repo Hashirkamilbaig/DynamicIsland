@@ -23,7 +23,7 @@ struct IslandView: View {
         // Panel is always full-size; only the chrome offset animates for reveal/tuck.
         // Do NOT attach .onHover here — it tracks the full panel frame and made the
         // tucked hot zone feel island-sized. Reveal is driven only by the mouse monitor
-        // + AppKit hitTest against IslandLayout.notchHitWidth/Height.
+        // + AppKit hitTest against the measured notch (NSScreen.notchSize).
         .frame(
             width: IslandLayout.panelWidth,
             height: IslandLayout.revealedPanelHeight,

@@ -16,8 +16,9 @@ enum IslandLayout {
 
     /// Notch sensor while tucked. Tiny on purpose; reveal uses only this rect
     /// (mouse monitor + AppKit hitTest), not the full panel frame.
-    static let notchHitWidth: CGFloat = 180
-    static let notchHitHeight: CGFloat = 44
+    /// Fallback for displays without a notch (14" MacBook Pro notch size).
+    static let notchHitWidth: CGFloat = 185
+    static let notchHitHeight: CGFloat = 32
     /// Pull chrome upward so it sits under the notch when tucked.
     static let tuckedOffsetY: CGFloat = -islandHeight
 }

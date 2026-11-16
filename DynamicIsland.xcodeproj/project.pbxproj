@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C43B5381CC34433CA73EE17A /* NSScreen+Notch.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF722AFC90C54060A07CC98B /* NSScreen+Notch.swift */; };
 		0A326D305EB0492F9D8E9842 /* IslandLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818F014C9ECD4339865D1ED5 /* IslandLayout.swift */; };
 		C55AA5F980004AB68078ACBE /* DynamicIslandApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494D1B622A6B46DEB5A62D17 /* DynamicIslandApp.swift */; };
 		54932E9C4B534CE88809B65E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B172EC76F34BF98CAD12AB /* AppDelegate.swift */; };
@@ -38,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BF722AFC90C54060A07CC98B /* NSScreen+Notch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+Notch.swift"; sourceTree = "<group>"; };
 		34D7F438F056442E84524B92 /* DynamicIsland.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DynamicIsland.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7774045A5A664636A25735F2 /* DynamicIslandTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DynamicIslandTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		494D1B622A6B46DEB5A62D17 /* DynamicIslandApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicIslandApp.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 				058EBA2BD5AF4ECABA09D927 /* IslandWindowController.swift */,
 				965551AE2F174BCABDA7A7D8 /* IslandView.swift */,
 				B55A75EA05D34981B96D6FB8 /* IslandState.swift */,
+				BF722AFC90C54060A07CC98B /* NSScreen+Notch.swift */,
 				818F014C9ECD4339865D1ED5 /* IslandLayout.swift */,
 			);
 			path = Island;
@@ -284,6 +287,7 @@
 				699B0E12B8B84AE3A065859E /* IslandWindowController.swift in Sources */,
 				25290FF5A83E415A82E0F5E8 /* IslandView.swift in Sources */,
 				5320531EEEBD4CB6A854D3C1 /* IslandState.swift in Sources */,
+				C43B5381CC34433CA73EE17A /* NSScreen+Notch.swift in Sources */,
 				0A326D305EB0492F9D8E9842 /* IslandLayout.swift in Sources */,
 				5F9BD25F56C84533A8D69C4C /* ShelfStore.swift in Sources */,
 				C6AB581E73BE42168544D841 /* ShelfItem.swift in Sources */,
