@@ -4,32 +4,36 @@ import UniformTypeIdentifiers
 
 struct ShelfDropView: View {
     @ObservedObject var store: ShelfStore
-    var isExpanded: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        ZStack {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color.white.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.14), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                )
+
             if store.items.isEmpty {
-                Text(isExpanded ? "Drop files here · kept 20s" : "Drop")
-                    .font(.system(size: isExpanded ? 11 : 10, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.45))
-                    .frame(maxWidth: .infinity, minHeight: isExpanded ? 36 : 20)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .strokeBorder(Color.white.opacity(0.12), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
-                    )
+                VStack(spacing: 6) {
+                    Image(systemName: "tray.and.arrow.down.fill")
+                        .font(.system(size: 18, weight: .medium))
+                    Text("Drag and drop files")
+                        .font(.system(size: 11, weight: .medium))
+                }
+                .foregroundStyle(.white.opacity(0.5))
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
+                    HStack(spacing: 6) {
                         ForEach(store.items) { item in
                             ShelfItemChip(item: item, store: store)
                         }
                     }
+                    .padding(6)
                 }
             }
         }
-        .padding(.horizontal, isExpanded ? 4 : 0)
-        // Parent IslandView owns drop targeting (so a drag can expand the tucked island).
-        // Keep a secondary drop zone here for drops onto the shelf chrome once revealed.
+        // Drops onto the revealed box; drops while tucked go through IslandHostingView.
         .onDrop(of: [.fileURL], isTargeted: nil, perform: handleDrop)
     }
 
@@ -77,7 +81,7 @@ private struct ShelfItemChip: View {
             Text(item.originalName)
                 .font(.system(size: 9, weight: .medium))
                 .lineLimit(1)
-                .frame(width: 72)
+                .frame(width: 60)
             Text("\(Int(item.remainingSeconds.rounded(.up)))s")
                 .font(.system(size: 9, weight: .semibold).monospacedDigit())
                 .foregroundStyle(.white.opacity(0.55))

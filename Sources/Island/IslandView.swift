@@ -3,7 +3,6 @@ import AppKit
 
 struct IslandView: View {
     @ObservedObject var state: IslandState
-    @State private var showShelf = false
     @State private var showVolume = false
 
     private var isRevealed: Bool { state.isRevealed }
@@ -28,7 +27,7 @@ struct IslandView: View {
             alignment: .top
         )
         .animation(isRevealed ? IslandMotion.grow : IslandMotion.shrink, value: state.presence)
-        .animation(.easeOut(duration: 0.18), value: showShelf)
+        .animation(.easeOut(duration: 0.18), value: showVolume)
         // Clicks do not dismiss. Drops are handled by IslandHostingView (AppKit).
     }
 
@@ -106,12 +105,10 @@ struct IslandView: View {
                         .padding(.top, 4)
                 }
 
-                Spacer(minLength: 0)
-            }
+                Spacer(minLength: 12)
 
-            if showShelf || !state.shelf.items.isEmpty {
-                ShelfDropView(store: state.shelf, isExpanded: true)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                ShelfDropView(store: state.shelf)
+                    .frame(width: IslandLayout.shelfWidth, height: IslandLayout.artSize)
             }
 
             if showVolume {
@@ -125,16 +122,6 @@ struct IslandView: View {
 
     private var utilityBar: some View {
         HStack(spacing: 14) {
-            Button {
-                withAnimation(.easeOut(duration: 0.18)) { showShelf.toggle() }
-            } label: {
-                Image(systemName: "tray.full.fill")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(showShelf || !state.shelf.items.isEmpty ? .white : .white.opacity(0.7))
-            }
-            .buttonStyle(.plain)
-            .help("File shelf")
-
             Button {
                 withAnimation(.easeOut(duration: 0.18)) { showVolume.toggle() }
             } label: {

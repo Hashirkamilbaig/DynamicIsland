@@ -15,6 +15,7 @@ enum IslandLayout {
     /// Approximate radius of the hardware notch's bottom corners.
     static let notchCornerRadius: CGFloat = 10
     static let artSize: CGFloat = 92
+    static let shelfWidth: CGFloat = 150
 
     /// Notch sensor while tucked. Tiny on purpose; reveal uses only this rect
     /// (mouse monitor + AppKit hitTest), not the full panel frame.
