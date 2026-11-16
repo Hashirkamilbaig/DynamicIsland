@@ -72,14 +72,14 @@ final class IslandState: ObservableObject {
     func reveal(reason: String) {
         tuckWorkItem?.cancel()
         guard presence != .revealed else { return }
-        Log.window.debug("Reveal (\(reason, privacy: .public))")
+        Log.window.info("Reveal (\(reason, privacy: .public)) at \(NSStringFromPoint(NSEvent.mouseLocation), privacy: .public)")
         presence = .revealed
     }
 
     func tuck(reason: String) {
         tuckWorkItem?.cancel()
         guard presence != .tucked else { return }
-        Log.window.debug("Tuck (\(reason, privacy: .public))")
+        Log.window.info("Tuck (\(reason, privacy: .public))")
         presence = .tucked
     }
 

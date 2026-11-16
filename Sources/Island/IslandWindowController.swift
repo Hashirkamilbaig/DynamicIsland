@@ -181,34 +181,6 @@ final class IslandHostingView<Content: View>: NSHostingView<Content> {
         return super.hitTest(point)
     }
 
-    override func updateTrackingAreas() {
-        // Drop any full-bounds tracking areas SwiftUI installed, then recreate.
-        for area in trackingAreas {
-            removeTrackingArea(area)
-        }
-        super.updateTrackingAreas()
-        // When tucked, strip tracking down to the notch sensor only.
-        guard let state, !state.isRevealed else { return }
-        for area in trackingAreas {
-            removeTrackingArea(area)
-        }
-        let options: NSTrackingArea.Options = [
-            .activeAlways,
-            .mouseEnteredAndExited,
-            .mouseMoved,
-            .inVisibleRect
-        ]
-        addTrackingArea(NSTrackingArea(rect: hitZoneInViewCoordinates(revealed: false), options: options, owner: self, userInfo: nil))
-    }
-
-    override func mouseEntered(with event: NSEvent) {
-        state?.setPointerInside(true, reason: "track-enter")
-    }
-
-    override func mouseExited(with event: NSEvent) {
-        state?.setPointerInside(false, reason: "track-exit")
-    }
-
     private func hitZoneInViewCoordinates(revealed: Bool) -> NSRect {
         let bounds = self.bounds
         if revealed {
@@ -225,13 +197,20 @@ final class IslandHostingView<Content: View>: NSHostingView<Content> {
     }
 
     override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
-        state?.setPointerInside(true, reason: "drag-enter")
-        return canAccept(sender) ? .copy : []
+        dragOperation(for: sender, reason: "drag-enter")
     }
 
     override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
-        state?.setPointerInside(true, reason: "drag-update")
-        return canAccept(sender) ? .copy : []
+        dragOperation(for: sender, reason: "drag-update")
+    }
+
+    /// Drag callbacks fire anywhere over the full-size panel, so gate them on the same hit zone as hover.
+    private func dragOperation(for sender: NSDraggingInfo, reason: String) -> NSDragOperation {
+        guard let state else { return [] }
+        let point = convert(sender.draggingLocation, from: nil)
+        let inside = hitZoneInViewCoordinates(revealed: state.isRevealed).contains(point)
+        state.setPointerInside(inside, reason: reason)
+        return inside && canAccept(sender) ? .copy : []
     }
 
     override func draggingExited(_ sender: NSDraggingInfo?) {
