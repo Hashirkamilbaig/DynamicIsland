@@ -175,21 +175,25 @@ struct IslandView: View {
     }
 
     private var playbackControls: some View {
-        HStack(spacing: 18) {
-            Button { state.nowPlaying.previousTrack() } label: {
-                Image(systemName: "backward.fill")
+        HStack(spacing: 6) {
+            transportButton("backward.fill", size: 16) { state.nowPlaying.previousTrack() }
+            transportButton(state.nowPlaying.info.isPlaying ? "pause.fill" : "play.fill", size: 22) {
+                state.nowPlaying.togglePlayPause()
             }
-            Button { state.nowPlaying.togglePlayPause() } label: {
-                Image(systemName: state.nowPlaying.info.isPlaying ? "pause.fill" : "play.fill")
-                    .frame(width: 16)
-            }
-            Button { state.nowPlaying.nextTrack() } label: {
-                Image(systemName: "forward.fill")
-            }
+            transportButton("forward.fill", size: 16) { state.nowPlaying.nextTrack() }
         }
-        .buttonStyle(.plain)
-        .font(.system(size: 14, weight: .semibold))
+        .padding(.leading, -10)
         .foregroundStyle(.white)
+    }
+
+    private func transportButton(_ symbol: String, size: CGFloat, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.system(size: size, weight: .semibold))
+                .frame(width: 40, height: 34)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(TransportButtonStyle())
     }
 
     private var volumeRow: some View {
@@ -272,5 +276,22 @@ private enum SourceBadge {
             return Style(symbol: "globe", color: Color(red: 0.20, green: 0.48, blue: 0.96))
         }
         return Style(symbol: "waveform", color: Color.white.opacity(0.35))
+    }
+}
+
+private struct TransportButtonStyle: ButtonStyle {
+    @State private var isHovering = false
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .background(
+                Circle()
+                    .fill(Color.white.opacity(configuration.isPressed ? 0.22 : isHovering ? 0.12 : 0))
+                    .frame(width: 34, height: 34)
+            )
+            .scaleEffect(configuration.isPressed ? 0.9 : 1)
+            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+            .animation(.easeOut(duration: 0.12), value: isHovering)
+            .onHover { isHovering = $0 }
     }
 }
