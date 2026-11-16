@@ -4,8 +4,6 @@ import AppKit
 struct IslandView: View {
     @ObservedObject var state: IslandState
     @State private var newSongsPulse = 0
-    @State private var newSongsArmed = false
-    @State private var newSongsTrack = ""
 
     private var isRevealed: Bool { state.isRevealed }
 
@@ -219,21 +217,16 @@ struct IslandView: View {
         } label: {
             Image(systemName: "sparkles")
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(newSongsArmed ? Self.spotifyGreen : Color.white.opacity(0.4))
+                .foregroundStyle(state.nowPlaying.newSongsArmed ? Self.spotifyGreen : Color.white.opacity(0.4))
                 .symbolEffect(.bounce, value: newSongsPulse)
                 .frame(width: 30, height: 34)
                 .contentShape(Rectangle())
         }
         .buttonStyle(TransportButtonStyle())
         .disabled(!isSpotify)
-        .help("Play new songs after this one")
-        .onChange(of: newSongsPulse) { _, _ in
-            newSongsArmed = true
-            newSongsTrack = info.title
-        }
-        .onChange(of: info.title) { _, title in
-            if title != newSongsTrack { newSongsArmed = false }
-        }
+        .help(state.nowPlaying.newSongsArmed
+              ? "After this song, Spotify continues with songs based on this playlist (click to cancel)"
+              : "Play new songs based on this playlist after this one")
     }
 
     private static let spotifyGreen = Color(red: 0.12, green: 0.84, blue: 0.38)

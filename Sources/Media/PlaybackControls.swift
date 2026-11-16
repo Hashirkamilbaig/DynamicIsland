@@ -32,21 +32,7 @@ enum PlaybackControls {
         """)
     }
 
-    static func continueWithAutoplay() {
-        runSpotifyCommandAsync("""
-          set shuffling to false
-          set repeating to false
-          set trackID to id of current track
-          set resumeAt to player position
-          set wasPlaying to (player state is playing)
-          play track trackID
-          delay 0.3
-          set player position to resumeAt
-          if not wasPlaying then pause
-        """)
-    }
-
-    /// Scripts that `delay` must stay off the main thread.
+    /// AppleScript round-trips to Spotify are slow enough to hitch the UI.
     private static func runSpotifyCommandAsync(_ command: String) {
         DispatchQueue.global(qos: .userInitiated).async {
             runSpotifyCommand(command)

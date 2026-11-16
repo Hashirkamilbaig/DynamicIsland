@@ -17,6 +17,8 @@ struct NowPlayingInfo: Equatable {
     var positionDate = Date()
     var shuffling = false
     var repeating = false
+    /// `spotify:track:…` when known.
+    var trackID = ""
 
     var playMode: PlayMode { PlayMode(shuffling: shuffling, repeating: repeating) }
 
@@ -47,6 +49,7 @@ struct NowPlayingInfo: Equatable {
             && lhs.duration == rhs.duration
             && lhs.shuffling == rhs.shuffling
             && lhs.repeating == rhs.repeating
+            && lhs.trackID == rhs.trackID
             && (lhs.artwork == nil) == (rhs.artwork == nil)
     }
 }
@@ -54,6 +57,22 @@ struct NowPlayingInfo: Equatable {
 @MainActor
 final class NowPlayingService: ObservableObject {
     @Published private(set) var info = NowPlayingInfo()
+    /// "New songs after this" is waiting for the current song to finish.
+    @Published private(set) var newSongsArmed = false
+
+    let spotifyAPI = SpotifyWebAPI()
+    var onNeedsSpotifyConnection: (() -> Void)?
+    var onError: ((String) -> Void)?
+
+    private struct Handoff {
+        let trackID: String
+        let contextURI: String
+        let end: SpotifyWebAPI.ContextEnd
+    }
+    private var handoff: Handoff?
+    private var handoffWork: DispatchWorkItem?
+    private var armedTrackID = ""
+    private var lastRemaining: TimeInterval = .infinity
 
     private var observers: [(center: NotificationCenter, token: NSObjectProtocol)] = []
     private var pollTimer: Timer?
@@ -96,15 +115,100 @@ final class NowPlayingService: ObservableObject {
         scheduleReconcile()
     }
 
-    /// Restarts the current song outside its playlist so it's the last thing
-    /// queued; when it ends, Spotify's Autoplay continues with new related songs.
+    /// Lets the current song finish, then jumps to the very end of the playlist
+    /// (or album) it's playing from. Reaching the end of the context is what makes
+    /// Spotify's Autoplay recommend songs based on that playlist.
     func playNewSongsAfterThis() {
         guard info.bundleIdentifier == "com.spotify.client", info.hasTrack else { return }
-        info.shuffling = false
-        info.repeating = false
-        optimisticModeUntil = Date().addingTimeInterval(1.5)
-        PlaybackControls.continueWithAutoplay()
-        scheduleReconcile()
+        if newSongsArmed {
+            cancelNewSongs(reason: "toggled off")
+            return
+        }
+        guard spotifyAPI.isConnected else {
+            onNeedsSpotifyConnection?()
+            return
+        }
+        newSongsArmed = true
+        armedTrackID = info.trackID
+        Task {
+            do {
+                let context = try await spotifyAPI.currentContext()
+                let end = try await spotifyAPI.end(of: context)
+                guard newSongsArmed, armedTrackID == info.trackID else { return }
+                info.shuffling = false
+                info.repeating = false
+                optimisticModeUntil = Date().addingTimeInterval(1.5)
+                PlaybackControls.setPlayMode(.off)
+                if end.uri == info.trackID {
+                    // Already the last song; Autoplay takes over on its own.
+                    Log.media.info("New songs: current track is already last in context")
+                } else {
+                    handoff = Handoff(trackID: info.trackID, contextURI: context.uri, end: end)
+                    Log.media.info("New songs armed: jump to \(context.uri, privacy: .public) #\(end.index) after current track")
+                }
+                scheduleHandoff()
+            } catch {
+                cancelNewSongs(reason: error.localizedDescription)
+                onError?(error.localizedDescription)
+            }
+        }
+    }
+
+    private func cancelNewSongs(reason: String) {
+        handoffWork?.cancel()
+        handoffWork = nil
+        handoff = nil
+        newSongsArmed = false
+        armedTrackID = ""
+        Log.media.info("New songs disarmed: \(reason, privacy: .public)")
+    }
+
+    private func scheduleHandoff() {
+        handoffWork?.cancel()
+        handoffWork = nil
+        guard handoff != nil, info.isPlaying, info.duration > 0 else { return }
+        let remaining = info.duration - info.elapsed(at: Date())
+        lastRemaining = remaining
+        let work = DispatchWorkItem { [weak self] in self?.fireHandoff() }
+        handoffWork = work
+        // Land just before the song ends so Spotify never starts the next playlist track.
+        DispatchQueue.main.asyncAfter(deadline: .now() + max(remaining - 0.45, 0), execute: work)
+    }
+
+    private func fireHandoff() {
+        guard let handoff else { return }
+        self.handoff = nil
+        handoffWork = nil
+        let startAt = max(handoff.end.durationMs - 1000, 0)
+        Task {
+            do {
+                try await spotifyAPI.play(context: handoff.contextURI, index: handoff.end.index, positionMs: startAt)
+                Log.media.info("New songs: jumped to end of context")
+            } catch {
+                cancelNewSongs(reason: error.localizedDescription)
+                onError?(error.localizedDescription)
+            }
+            scheduleReconcile()
+        }
+    }
+
+    /// Called after every poll while armed.
+    private func updateNewSongs() {
+        guard newSongsArmed else { return }
+        if info.trackID == armedTrackID {
+            scheduleHandoff()
+            return
+        }
+        if handoff != nil, lastRemaining < 2.5 {
+            // The song ended before the timer fired; jump now.
+            fireHandoff()
+        }
+        if handoff == nil {
+            newSongsArmed = false
+            armedTrackID = ""
+        } else {
+            cancelNewSongs(reason: "track changed before the song finished")
+        }
     }
 
     func seek(to seconds: TimeInterval) {
@@ -242,6 +346,7 @@ final class NowPlayingService: ObservableObject {
             }
         }
         info = next
+        updateNewSongs()
     }
 
     static func spotifyNowPlayingViaAppleScript() -> NowPlayingInfo? {
@@ -261,7 +366,8 @@ final class NowPlayingService: ObservableObject {
           set dur to duration of current track
           set shuf to shuffling as string
           set rep to repeating as string
-          return t & "|||" & a & "|||" & al & "|||" & playingState & "|||" & art & "|||" & pos & "|||" & dur & "|||" & shuf & "|||" & rep
+          set tid to id of current track
+          return t & "|||" & a & "|||" & al & "|||" & playingState & "|||" & art & "|||" & pos & "|||" & dur & "|||" & shuf & "|||" & rep & "|||" & tid
         end tell
         """
         var error: NSDictionary?
@@ -289,7 +395,8 @@ final class NowPlayingService: ObservableObject {
             position: parts.count > 5 ? (Double(parts[5]) ?? 0) / 1000 : 0,
             duration: parts.count > 6 ? (Double(parts[6]) ?? 0) / 1000 : 0,
             shuffling: parts.count > 7 && parts[7] == "true",
-            repeating: parts.count > 8 && parts[8] == "true"
+            repeating: parts.count > 8 && parts[8] == "true",
+            trackID: parts.count > 9 ? parts[9] : ""
         )
     }
 }

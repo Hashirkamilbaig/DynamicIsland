@@ -27,6 +27,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             .store(in: &cancellables)
 
+        state.nowPlaying.onNeedsSpotifyConnection = { [weak self] in self?.connectSpotify() }
+        state.nowPlaying.onError = { [weak self] message in self?.showAlert("New songs after this", message) }
+
         installStatusItem()
         NSApp.setActivationPolicy(.accessory)
     }
@@ -46,7 +49,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(NSMenuItem(title: "Show Island", action: #selector(showIsland), keyEquivalent: "s"))
         menu.addItem(NSMenuItem(title: "Reveal / Hide", action: #selector(toggleIsland), keyEquivalent: "e"))
         menu.addItem(.separator())
+        menu.addItem(spotifyMenuItem)
+        menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Quit Dynamic Island", action: #selector(quit), keyEquivalent: "q"))
+        menu.delegate = self
         item.menu = menu
         statusItem = item
     }
@@ -60,7 +66,65 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         state?.toggleFromMenu()
     }
 
+    private lazy var spotifyMenuItem = NSMenuItem(title: "Connect Spotify…", action: #selector(toggleSpotifyConnection), keyEquivalent: "")
+
+    @objc private func toggleSpotifyConnection() {
+        guard let api = state?.nowPlaying.spotifyAPI else { return }
+        if api.isConnected {
+            api.disconnect()
+        } else {
+            connectSpotify()
+        }
+    }
+
+    private func connectSpotify() {
+        guard let api = state?.nowPlaying.spotifyAPI else { return }
+        NSApp.activate(ignoringOtherApps: true)
+        let alert = NSAlert()
+        alert.messageText = "Connect Spotify"
+        alert.informativeText = """
+        "New songs after this" needs to know which playlist is playing, which only Spotify's Web API can tell.
+
+        1. Open developer.spotify.com/dashboard and create an app.
+        2. Add this Redirect URI: \(SpotifyWebAPI.redirectURI)
+        3. Tick "Web API", save, and paste the app's Client ID below.
+        """
+        let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 320, height: 24))
+        field.placeholderString = "Client ID"
+        field.stringValue = api.clientID ?? ""
+        alert.accessoryView = field
+        alert.addButton(withTitle: "Connect")
+        alert.addButton(withTitle: "Open Dashboard")
+        alert.addButton(withTitle: "Cancel")
+        alert.window.initialFirstResponder = field
+        switch alert.runModal() {
+        case .alertFirstButtonReturn:
+            let id = field.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !id.isEmpty else { return }
+            api.connect(clientID: id)
+        case .alertSecondButtonReturn:
+            NSWorkspace.shared.open(URL(string: "https://developer.spotify.com/dashboard")!)
+        default:
+            break
+        }
+    }
+
+    private func showAlert(_ title: String, _ message: String) {
+        NSApp.activate(ignoringOtherApps: true)
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = message
+        alert.runModal()
+    }
+
     @objc private func quit() {
         NSApp.terminate(nil)
+    }
+}
+
+extension AppDelegate: NSMenuDelegate {
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        let connected = state?.nowPlaying.spotifyAPI.isConnected ?? false
+        spotifyMenuItem.title = connected ? "Disconnect Spotify" : "Connect Spotify…"
     }
 }

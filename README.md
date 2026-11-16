@@ -30,6 +30,18 @@ open build/Build/Products/Debug/DynamicIsland.app
 
 Signing: Debug uses ad-hoc identity (`CODE_SIGN_IDENTITY = "-"`) so a free Apple ID / local Run works. If Xcode asks for a team, pick your Personal Team; paid Developer Program is not required for local use.
 
+## Spotify playback modes
+
+- **Shuffle / repeat button** (left of the controls) cycles off → shuffle → repeat. Spotify's AppleScript only exposes shuffle and repeat as on/off, so Smart Shuffle and repeat-one aren't available.
+- **New songs after this** (sparkles, right of the controls) lets the current song finish, then jumps to the end of the playlist you're playing so Spotify's Autoplay continues with songs based on that playlist. Click again to cancel.
+
+The second button needs the Spotify Web API, because AppleScript can't tell which playlist is playing:
+
+1. Create an app at [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard), tick **Web API**, and add the redirect URI `http://127.0.0.1:43821/callback`.
+2. Menu bar icon → **Connect Spotify…** → paste the app's Client ID → approve in the browser.
+
+Tokens are stored in `~/Library/Application Support/DynamicIsland/spotify-token.json` (owner-only). Spotify's Autoplay setting must be on, and playback control through the Web API requires Premium.
+
 ## Permissions
 
 | Permission | When needed |
