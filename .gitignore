@@ -1,20 +1,19 @@
-# Xcode
-DerivedData/
-build/
-*.xcuserstate
-xcuserdata/
-*.moved-aside
-*.hmap
-*.ipa
-*.dSYM.zip
-*.dSYM
-
-# Swift Package Manager
-.build/
-.swiftpm/
-
-# macOS
-.DS_Store
 
 # Misc
+# Swift Package Manager
+# Xcode
+# macOS
+*.dSYM
+*.dSYM.zip
+*.hmap
+*.ipa
 *.log
+*.moved-aside
+*.xcuserstate
+.DS_Store
+.build/
+.swiftpm/
+DerivedData/
+Resources/Reference/
+build/
+xcuserdata/

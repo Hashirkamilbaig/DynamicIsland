@@ -9,10 +9,14 @@ struct ShelfDropView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             if store.items.isEmpty {
-                Text(isExpanded ? "Drop files here (kept 20s)" : "Drop")
-                    .font(.system(size: isExpanded ? 12 : 10, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.7))
-                    .frame(maxWidth: .infinity, minHeight: isExpanded ? 44 : 20)
+                Text(isExpanded ? "Drop files here · kept 20s" : "Drop")
+                    .font(.system(size: isExpanded ? 11 : 10, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.45))
+                    .frame(maxWidth: .infinity, minHeight: isExpanded ? 36 : 20)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .strokeBorder(Color.white.opacity(0.12), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                    )
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {

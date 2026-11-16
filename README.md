@@ -1,6 +1,6 @@
 # Dynamic Island (macOS)
 
-Floating island that stays tucked under the Mac notch until the pointer enters the notch region, with:
+Floating island that stays tucked under the Mac notch until the pointer enters the notch region. When revealed it hugs the top of the screen so the black body blends with the hardware notch, with:
 
 1. **File shelf** — drop files in, drag them out for ~20 seconds, then they auto-purge
 2. **Now Playing** — title / artist / artwork plus play, pause, next, previous

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A326D305EB0492F9D8E9842 /* IslandLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818F014C9ECD4339865D1ED5 /* IslandLayout.swift */; };
 		C55AA5F980004AB68078ACBE /* DynamicIslandApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494D1B622A6B46DEB5A62D17 /* DynamicIslandApp.swift */; };
 		54932E9C4B534CE88809B65E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B172EC76F34BF98CAD12AB /* AppDelegate.swift */; };
 		699B0E12B8B84AE3A065859E /* IslandWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058EBA2BD5AF4ECABA09D927 /* IslandWindowController.swift */; };
@@ -44,6 +45,7 @@
 		058EBA2BD5AF4ECABA09D927 /* IslandWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandWindowController.swift; sourceTree = "<group>"; };
 		965551AE2F174BCABDA7A7D8 /* IslandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandView.swift; sourceTree = "<group>"; };
 		B55A75EA05D34981B96D6FB8 /* IslandState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandState.swift; sourceTree = "<group>"; };
+		818F014C9ECD4339865D1ED5 /* IslandLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandLayout.swift; sourceTree = "<group>"; };
 		43D925DB415E4D519E955221 /* ShelfStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfStore.swift; sourceTree = "<group>"; };
 		4D393CBAE8C047FFA319EC57 /* ShelfItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfItem.swift; sourceTree = "<group>"; };
 		1A86B811617B4295AA1068A3 /* ShelfDropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfDropView.swift; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 				058EBA2BD5AF4ECABA09D927 /* IslandWindowController.swift */,
 				965551AE2F174BCABDA7A7D8 /* IslandView.swift */,
 				B55A75EA05D34981B96D6FB8 /* IslandState.swift */,
+				818F014C9ECD4339865D1ED5 /* IslandLayout.swift */,
 			);
 			path = Island;
 			sourceTree = "<group>";
@@ -281,6 +284,7 @@
 				699B0E12B8B84AE3A065859E /* IslandWindowController.swift in Sources */,
 				25290FF5A83E415A82E0F5E8 /* IslandView.swift in Sources */,
 				5320531EEEBD4CB6A854D3C1 /* IslandState.swift in Sources */,
+				0A326D305EB0492F9D8E9842 /* IslandLayout.swift in Sources */,
 				5F9BD25F56C84533A8D69C4C /* ShelfStore.swift in Sources */,
 				C6AB581E73BE42168544D841 /* ShelfItem.swift in Sources */,
 				B7D5C941FC13483B95AC9AFD /* ShelfDropView.swift in Sources */,

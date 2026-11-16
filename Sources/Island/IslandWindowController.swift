@@ -50,6 +50,8 @@ final class IslandWindowController {
         // Full screen frame includes the menu-bar / notch band (visibleFrame does not).
         let screenFrame = screen.frame
         let width = IslandLayout.panelWidth
+        // Revealed panel is taller than the island so the soft shadow below is not clipped;
+        // the island itself is top-aligned and flush with screen.maxY.
         let height = revealed ? IslandLayout.revealedPanelHeight : IslandLayout.notchHitHeight
         let x = screenFrame.midX - width / 2
         let y = screenFrame.maxY - height
@@ -71,6 +73,7 @@ final class IslandWindowController {
         )
         panel.contentView = hostingView
         panel.isFloatingPanel = true
+        // Above the menu bar so the notch hit target receives mouse/drag events.
         panel.level = .statusBar
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
         panel.isOpaque = false
@@ -117,11 +120,17 @@ final class IslandWindowController {
         guard let screen = NSScreen.main else { return }
         let mouse = NSEvent.mouseLocation
 
-        // While revealed, the interactive zone is the whole panel (not just the notch strip),
-        // otherwise moving down onto controls would count as "left" and tuck immediately.
+        // While revealed, the interactive zone is the island body (not the shadow padding alone).
         let zone: NSRect
         if state.isRevealed, let panel {
-            zone = panel.frame.insetBy(dx: -6, dy: -6)
+            // Island is top-aligned inside the panel; ignore bottom shadow padding for hit-testing.
+            let body = NSRect(
+                x: panel.frame.midX - IslandLayout.islandWidth / 2,
+                y: panel.frame.maxY - IslandLayout.islandHeight,
+                width: IslandLayout.islandWidth,
+                height: IslandLayout.islandHeight
+            )
+            zone = body.insetBy(dx: -6, dy: -6)
         } else {
             zone = notchHitBand(on: screen)
         }
