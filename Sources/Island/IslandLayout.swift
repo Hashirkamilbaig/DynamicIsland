@@ -12,6 +12,8 @@ enum IslandLayout {
     /// Clearance under the physical camera notch before content begins.
     static let notchClearance: CGFloat = 34
     static let bottomCornerRadius: CGFloat = 42
+    /// Approximate radius of the hardware notch's bottom corners.
+    static let notchCornerRadius: CGFloat = 10
     static let artSize: CGFloat = 92
 
     /// Notch sensor while tucked. Tiny on purpose; reveal uses only this rect
@@ -19,6 +21,4 @@ enum IslandLayout {
     /// Fallback for displays without a notch (14" MacBook Pro notch size).
     static let notchHitWidth: CGFloat = 185
     static let notchHitHeight: CGFloat = 32
-    /// Pull chrome upward so it sits under the notch when tucked.
-    static let tuckedOffsetY: CGFloat = -islandHeight
 }

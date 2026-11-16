@@ -16,11 +16,9 @@ struct IslandView: View {
                 .contentShape(Rectangle())
 
             islandChrome
-                .offset(y: isRevealed ? 0 : IslandLayout.tuckedOffsetY)
-                .opacity(isRevealed ? 1 : 0.001)
                 .allowsHitTesting(isRevealed)
         }
-        // Panel is always full-size; only the chrome offset animates for reveal/tuck.
+        // Panel is always full-size; only the chrome morphs between notch size and full size.
         // Do NOT attach .onHover here — it tracks the full panel frame and made the
         // tucked hot zone feel island-sized. Reveal is driven only by the mouse monitor
         // + AppKit hitTest against the measured notch (NSScreen.notchSize).
@@ -29,35 +27,54 @@ struct IslandView: View {
             height: IslandLayout.revealedPanelHeight,
             alignment: .top
         )
-        .animation(.spring(response: 0.32, dampingFraction: 0.88), value: state.presence)
+        .animation(isRevealed ? IslandMotion.grow : IslandMotion.shrink, value: state.presence)
         .animation(.easeOut(duration: 0.18), value: showShelf)
         // Clicks do not dismiss. Drops are handled by IslandHostingView (AppKit).
     }
 
+    private var notch: CGSize {
+        NSScreen.main?.notchSize ?? CGSize(width: IslandLayout.notchHitWidth, height: IslandLayout.notchHitHeight)
+    }
+
+    private var hasNotch: Bool {
+        (NSScreen.main?.safeAreaInsets.top ?? 0) > 0
+    }
+
+    private var bodySize: CGSize {
+        isRevealed ? CGSize(width: IslandLayout.islandWidth, height: IslandLayout.islandHeight) : notch
+    }
+
     private var islandChrome: some View {
         ZStack(alignment: .top) {
-            // Soft outer glow / shadow against wallpaper (panel has transparent padding).
-            IslandBodyShape()
-                .fill(Color.black.opacity(0.45))
-                .blur(radius: 18)
-                .offset(y: 8)
-                .padding(.horizontal, 6)
+            // Body grows out of the notch and shrinks back into it. When tucked it is exactly
+            // notch-sized and black, so it hides behind the hardware notch.
+            ZStack {
+                IslandBodyShape(bottomRadius: isRevealed ? IslandLayout.bottomCornerRadius : IslandLayout.notchCornerRadius)
+                    .fill(Color.black.opacity(0.45))
+                    .blur(radius: 18)
+                    .offset(y: 8)
+                    .padding(.horizontal, 6)
+                    .opacity(isRevealed ? 1 : 0)
 
-            IslandBodyShape()
-                .fill(Color.black)
-                .overlay(
-                    IslandBodyShape()
-                        .stroke(Color.white.opacity(0.06), lineWidth: 1)
-                )
-                .shadow(color: .black.opacity(0.55), radius: 22, y: 10)
+                IslandBodyShape(bottomRadius: isRevealed ? IslandLayout.bottomCornerRadius : IslandLayout.notchCornerRadius)
+                    .fill(Color.black)
+                    .shadow(color: .black.opacity(isRevealed ? 0.55 : 0), radius: 22, y: 10)
+            }
+            .frame(width: bodySize.width, height: bodySize.height)
+            .opacity(isRevealed || hasNotch ? 1 : 0)
 
             expandedContent
                 .padding(.top, IslandLayout.notchClearance)
                 .padding(.horizontal, 22)
                 .padding(.bottom, 18)
+                .frame(width: IslandLayout.islandWidth, height: IslandLayout.islandHeight)
+                .scaleEffect(isRevealed ? 1 : 0.4, anchor: .top)
+                .blur(radius: isRevealed ? 0 : 6)
                 .opacity(isRevealed ? 1 : 0)
+                .animation(isRevealed ? IslandMotion.contentIn : IslandMotion.contentOut, value: state.presence)
         }
-        .frame(width: IslandLayout.islandWidth, height: IslandLayout.islandHeight)
+        .frame(width: IslandLayout.islandWidth, height: IslandLayout.islandHeight, alignment: .top)
+        .clipped()
         .frame(maxWidth: .infinity, alignment: .top)
         .animation(.easeOut(duration: 0.2), value: state.nowPlaying.info.title)
     }
@@ -242,16 +259,35 @@ struct IslandView: View {
 /// Flat against the top of the screen; heavily rounded only at the bottom so it
 /// visually merges with the hardware notch instead of reading as a floating pill.
 struct IslandBodyShape: Shape {
+    var bottomRadius: CGFloat
+
+    var animatableData: CGFloat {
+        get { bottomRadius }
+        set { bottomRadius = newValue }
+    }
+
     func path(in rect: CGRect) -> Path {
-        UnevenRoundedRectangle(
+        let radius = min(bottomRadius, rect.height / 2, rect.width / 2)
+        return UnevenRoundedRectangle(
             topLeadingRadius: 0,
-            bottomLeadingRadius: IslandLayout.bottomCornerRadius,
-            bottomTrailingRadius: IslandLayout.bottomCornerRadius,
+            bottomLeadingRadius: radius,
+            bottomTrailingRadius: radius,
             topTrailingRadius: 0,
             style: .continuous
         )
         .path(in: rect)
     }
+}
+
+private enum IslandMotion {
+    /// Slight overshoot as it pops out of the notch.
+    static let grow = Animation.spring(response: 0.42, dampingFraction: 0.74)
+    /// Quicker, no bounce, so it reads as being sucked back in.
+    static let shrink = Animation.spring(response: 0.3, dampingFraction: 0.95)
+    /// Content appears once the body has started opening.
+    static let contentIn = Animation.easeOut(duration: 0.22).delay(0.1)
+    /// Content vanishes before the body closes around it.
+    static let contentOut = Animation.easeIn(duration: 0.1)
 }
 
 private enum SourceBadge {
