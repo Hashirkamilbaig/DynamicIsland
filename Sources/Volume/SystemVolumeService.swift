@@ -1,5 +1,6 @@
 import Foundation
 import CoreAudio
+import AudioToolbox
 import Combine
 
 /// Reads and writes the default output device volume (hardware / Core Audio), not app-specific volume.
@@ -11,16 +12,22 @@ final class SystemVolumeService: ObservableObject {
     private var deviceID: AudioDeviceID = AudioObjectID(kAudioObjectUnknown)
     private var volumeListenerBlock: AudioObjectPropertyListenerBlock?
     private var muteListenerBlock: AudioObjectPropertyListenerBlock?
+    private var deviceChangeBlock: AudioObjectPropertyListenerBlock?
 
     init() {
         refreshDevice()
         refresh()
         installListeners()
+        observeDefaultDevice()
     }
 
     deinit {
         // Listeners use DispatchQueue.main blocks; tear down without hopping to MainActor.
         Self.removeListeners(deviceID: deviceID, volumeBlock: volumeListenerBlock, muteBlock: muteListenerBlock)
+        if let deviceChangeBlock {
+            var address = Self.defaultDeviceAddress()
+            AudioObjectRemovePropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &address, DispatchQueue.main, deviceChangeBlock)
+        }
     }
 
     func setVolume(_ value: Float) {
@@ -29,14 +36,10 @@ final class SystemVolumeService: ObservableObject {
 
         var vol = clamped
         var address = Self.volumeAddress()
-        let status = AudioObjectSetPropertyData(
-            deviceID,
-            &address,
-            0,
-            nil,
-            UInt32(MemoryLayout<Float>.size),
-            &vol
-        )
+        var status = AudioObjectSetPropertyData(deviceID, &address, 0, nil, UInt32(MemoryLayout<Float>.size), &vol)
+        if status != noErr {
+            status = setChannelVolumes(clamped)
+        }
         if status != noErr {
             Log.volume.error("setVolume failed: \(status)")
             return
@@ -84,12 +87,38 @@ final class SystemVolumeService: ObservableObject {
 
     // MARK: - Core Audio
 
+    private func setChannelVolumes(_ value: Float) -> OSStatus {
+        var result: OSStatus = kAudioHardwareUnknownPropertyError
+        for element: UInt32 in [1, 2] {
+            var address = AudioObjectPropertyAddress(
+                mSelector: kAudioDevicePropertyVolumeScalar,
+                mScope: kAudioDevicePropertyScopeOutput,
+                mElement: element
+            )
+            var vol = value
+            if AudioObjectSetPropertyData(deviceID, &address, 0, nil, UInt32(MemoryLayout<Float>.size), &vol) == noErr {
+                result = noErr
+            }
+        }
+        return result
+    }
+
+    private func observeDefaultDevice() {
+        let block: AudioObjectPropertyListenerBlock = { [weak self] _, _ in
+            Task { @MainActor in
+                guard let self else { return }
+                self.removeListeners()
+                self.refresh()
+                self.installListeners()
+            }
+        }
+        deviceChangeBlock = block
+        var address = Self.defaultDeviceAddress()
+        AudioObjectAddPropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &address, DispatchQueue.main, block)
+    }
+
     private func refreshDevice() {
-        var address = AudioObjectPropertyAddress(
-            mSelector: kAudioHardwarePropertyDefaultOutputDevice,
-            mScope: kAudioObjectPropertyScopeGlobal,
-            mElement: kAudioObjectPropertyElementMain
-        )
+        var address = Self.defaultDeviceAddress()
         var device = AudioDeviceID(0)
         var size = UInt32(MemoryLayout<AudioDeviceID>.size)
         let status = AudioObjectGetPropertyData(
@@ -194,9 +223,19 @@ final class SystemVolumeService: ObservableObject {
         }
     }
 
+    nonisolated private static func defaultDeviceAddress() -> AudioObjectPropertyAddress {
+        AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDefaultOutputDevice,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+    }
+
+    /// The virtual main volume is what the menu bar / volume keys drive; unlike the
+    /// main-element scalar it exists on built-in, Bluetooth and USB outputs alike.
     nonisolated private static func volumeAddress() -> AudioObjectPropertyAddress {
         AudioObjectPropertyAddress(
-            mSelector: kAudioDevicePropertyVolumeScalar,
+            mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
             mScope: kAudioDevicePropertyScopeOutput,
             mElement: kAudioObjectPropertyElementMain
         )
