@@ -21,6 +21,9 @@ struct IslandView: View {
                 .allowsHitTesting(isRevealed)
         }
         // Panel is always full-size; only the chrome offset animates for reveal/tuck.
+        // Do NOT attach .onHover here — it tracks the full panel frame and made the
+        // tucked hot zone feel island-sized. Reveal is driven only by the mouse monitor
+        // + AppKit hitTest against IslandLayout.notchHitWidth/Height.
         .frame(
             width: IslandLayout.panelWidth,
             height: IslandLayout.revealedPanelHeight,
@@ -28,9 +31,6 @@ struct IslandView: View {
         )
         .animation(.spring(response: 0.32, dampingFraction: 0.88), value: state.presence)
         .animation(.easeOut(duration: 0.18), value: showShelf)
-        .onHover { hovering in
-            state.setPointerInside(hovering, reason: hovering ? "swiftui-hover" : "swiftui-hover-exit")
-        }
         // Clicks do not dismiss. Drops are handled by IslandHostingView (AppKit).
     }
 

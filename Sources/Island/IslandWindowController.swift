@@ -181,6 +181,34 @@ final class IslandHostingView<Content: View>: NSHostingView<Content> {
         return super.hitTest(point)
     }
 
+    override func updateTrackingAreas() {
+        // Drop any full-bounds tracking areas SwiftUI installed, then recreate.
+        for area in trackingAreas {
+            removeTrackingArea(area)
+        }
+        super.updateTrackingAreas()
+        // When tucked, strip tracking down to the notch sensor only.
+        guard let state, !state.isRevealed else { return }
+        for area in trackingAreas {
+            removeTrackingArea(area)
+        }
+        let options: NSTrackingArea.Options = [
+            .activeAlways,
+            .mouseEnteredAndExited,
+            .mouseMoved,
+            .inVisibleRect
+        ]
+        addTrackingArea(NSTrackingArea(rect: hitZoneInViewCoordinates(revealed: false), options: options, owner: self, userInfo: nil))
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        state?.setPointerInside(true, reason: "track-enter")
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        state?.setPointerInside(false, reason: "track-exit")
+    }
+
     private func hitZoneInViewCoordinates(revealed: Bool) -> NSRect {
         let bounds = self.bounds
         if revealed {
