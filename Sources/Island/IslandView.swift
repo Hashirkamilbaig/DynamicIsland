@@ -48,19 +48,10 @@ struct IslandView: View {
         ZStack(alignment: .top) {
             // Body grows out of the notch and shrinks back into it. When tucked it is exactly
             // notch-sized and black, so it hides behind the hardware notch.
-            ZStack {
-                IslandBodyShape(bottomRadius: isRevealed ? IslandLayout.bottomCornerRadius : IslandLayout.notchCornerRadius)
-                    .fill(Color.black.opacity(0.45))
-                    .blur(radius: 18)
-                    .offset(y: 8)
-                    .padding(.horizontal, 6)
-                    .opacity(isRevealed ? 1 : 0)
-
-                IslandBodyShape(bottomRadius: isRevealed ? IslandLayout.bottomCornerRadius : IslandLayout.notchCornerRadius)
-                    .fill(Color.black)
-                    .shadow(color: .black.opacity(isRevealed ? 0.55 : 0), radius: 22, y: 10)
-            }
-            .frame(width: bodySize.width, height: bodySize.height)
+            IslandBodyShape(bottomRadius: isRevealed ? IslandLayout.bottomCornerRadius : IslandLayout.notchCornerRadius)
+                .fill(Color.black)
+                .frame(width: bodySize.width, height: bodySize.height)
+                .shadow(color: .black.opacity(isRevealed ? 0.25 : 0), radius: 14, y: 6)
             .opacity(isRevealed || hasNotch ? 1 : 0)
 
             expandedContent
@@ -74,7 +65,6 @@ struct IslandView: View {
                 .animation(isRevealed ? IslandMotion.contentIn : IslandMotion.contentOut, value: state.presence)
         }
         .frame(width: IslandLayout.islandWidth, height: IslandLayout.islandHeight, alignment: .top)
-        .clipped()
         .frame(maxWidth: .infinity, alignment: .top)
         .animation(.easeOut(duration: 0.2), value: state.nowPlaying.info.title)
     }
