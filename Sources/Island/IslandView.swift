@@ -70,36 +70,26 @@ struct IslandView: View {
 
     private var expandedContent: some View {
         VStack(alignment: .leading, spacing: 10) {
-            utilityBar
-
             HStack(alignment: .top, spacing: 16) {
                 artwork
 
-                VStack(alignment: .leading, spacing: 6) {
-                    MarqueeText(text: state.nowPlaying.info.hasTrack ? state.nowPlaying.info.title : "Nothing playing", isActive: isRevealed)
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(.white)
-
-                    if state.nowPlaying.info.hasTrack {
-                        if !state.nowPlaying.info.album.isEmpty {
-                            MarqueeText(text: state.nowPlaying.info.album.uppercased(), isActive: isRevealed)
-                                .font(.system(size: 11, weight: .semibold))
-                                .tracking(0.6)
-                                .foregroundStyle(.white.opacity(0.85))
-                        }
-
-                        MarqueeText(text: state.nowPlaying.info.artist, isActive: isRevealed)
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.55))
-                    } else {
-                        Text("Play something in Spotify or Music")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.55))
-                            .lineLimit(1)
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        MarqueeText(text: info.hasTrack ? info.title : "Nothing playing", isActive: isRevealed)
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(.white)
+                        volumeToggle
                     }
 
+                    MarqueeText(text: subtitle, isActive: isRevealed)
+                        .font(.system(size: 13, weight: .regular))
+                        .foregroundStyle(.white.opacity(0.5))
+
                     playbackControls
-                        .padding(.top, 4)
+                        .padding(.top, 2)
+
+                    PlaybackProgressBar(info: info, isActive: isRevealed) { state.nowPlaying.seek(to: $0) }
+                        .opacity(info.duration > 0 ? 1 : 0)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -116,21 +106,25 @@ struct IslandView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
-    private var utilityBar: some View {
-        HStack(spacing: 14) {
-            Button {
-                withAnimation(.easeOut(duration: 0.18)) { showVolume.toggle() }
-            } label: {
-                Image(systemName: "square.stack.3d.up.fill")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(showVolume ? .white : .white.opacity(0.7))
-            }
-            .buttonStyle(.plain)
-            .help("System volume")
+    private var info: NowPlayingInfo { state.nowPlaying.info }
 
-            Spacer()
+    private var subtitle: String {
+        guard info.hasTrack else { return "Play something in Spotify or Music" }
+        return [info.artist, info.album].filter { !$0.isEmpty }.joined(separator: " – ")
+    }
+
+    private var volumeToggle: some View {
+        Button {
+            withAnimation(.easeOut(duration: 0.18)) { showVolume.toggle() }
+        } label: {
+            Image(systemName: "speaker.wave.2.fill")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.white.opacity(showVolume ? 0.9 : 0.4))
+                .frame(width: 20, height: 18)
+                .contentShape(Rectangle())
         }
-        .frame(height: 16)
+        .buttonStyle(.plain)
+        .help("System volume")
     }
 
     private var artwork: some View {
@@ -175,15 +169,17 @@ struct IslandView: View {
     }
 
     private var playbackControls: some View {
-        HStack(spacing: 6) {
-            transportButton("backward.fill", size: 16) { state.nowPlaying.previousTrack() }
-            transportButton(state.nowPlaying.info.isPlaying ? "pause.fill" : "play.fill", size: 22) {
+        HStack(spacing: 0) {
+            transportButton("backward.fill", size: 18) { state.nowPlaying.previousTrack() }
+            Spacer(minLength: 0)
+            transportButton(info.isPlaying ? "pause.fill" : "play.fill", size: 24) {
                 state.nowPlaying.togglePlayPause()
             }
-            transportButton("forward.fill", size: 16) { state.nowPlaying.nextTrack() }
+            Spacer(minLength: 0)
+            transportButton("forward.fill", size: 18) { state.nowPlaying.nextTrack() }
         }
-        .padding(.leading, -10)
-        .foregroundStyle(.white)
+        .padding(.horizontal, -8)
+        .foregroundStyle(.white.opacity(0.75))
     }
 
     private func transportButton(_ symbol: String, size: CGFloat, action: @escaping () -> Void) -> some View {

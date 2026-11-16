@@ -25,6 +25,11 @@ enum PlaybackControls {
         runSpotifyCommand("previous track")
     }
 
+    /// MediaRemote has no seek command in the bridge, so seeking is Spotify-only.
+    static func seek(to seconds: TimeInterval) {
+        runSpotifyCommand("set player position to \(Int(seconds.rounded()))")
+    }
+
     private static func runSpotifyCommand(_ command: String) {
         let source = """
         tell application "Spotify"

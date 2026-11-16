@@ -11,6 +11,10 @@ struct NowPlayingInfo: Equatable {
     var isPlaying: Bool = false
     var bundleIdentifier: String?
     var source: Source = .none
+    /// Playback position in seconds as of `positionDate`.
+    var position: TimeInterval = 0
+    var duration: TimeInterval = 0
+    var positionDate = Date()
 
     enum Source: String, Equatable {
         case none
@@ -22,6 +26,11 @@ struct NowPlayingInfo: Equatable {
         !title.isEmpty || !artist.isEmpty
     }
 
+    func elapsed(at date: Date) -> TimeInterval {
+        let live = isPlaying ? position + date.timeIntervalSince(positionDate) : position
+        return duration > 0 ? min(max(live, 0), duration) : max(live, 0)
+    }
+
     static func == (lhs: NowPlayingInfo, rhs: NowPlayingInfo) -> Bool {
         lhs.title == rhs.title
             && lhs.artist == rhs.artist
@@ -30,6 +39,8 @@ struct NowPlayingInfo: Equatable {
             && lhs.bundleIdentifier == rhs.bundleIdentifier
             && lhs.source == rhs.source
             && lhs.artworkURL == rhs.artworkURL
+            && lhs.position == rhs.position
+            && lhs.duration == rhs.duration
             && (lhs.artwork == nil) == (rhs.artwork == nil)
     }
 }
@@ -60,9 +71,19 @@ final class NowPlayingService: ObservableObject {
     }
 
     func togglePlayPause() {
+        let now = Date()
+        info.position = info.elapsed(at: now)
+        info.positionDate = now
         info.isPlaying.toggle()
         optimisticPlayStateUntil = Date().addingTimeInterval(0.8)
         PlaybackControls.togglePlayPause()
+        scheduleReconcile()
+    }
+
+    func seek(to seconds: TimeInterval) {
+        info.position = seconds
+        info.positionDate = Date()
+        PlaybackControls.seek(to: seconds)
         scheduleReconcile()
     }
 
@@ -205,7 +226,9 @@ final class NowPlayingService: ObservableObject {
           set al to album of current track
           set playingState to player state as string
           set art to artwork url of current track
-          return t & "|||" & a & "|||" & al & "|||" & playingState & "|||" & art
+          set pos to (player position * 1000) as integer
+          set dur to duration of current track
+          return t & "|||" & a & "|||" & al & "|||" & playingState & "|||" & art & "|||" & pos & "|||" & dur
         end tell
         """
         var error: NSDictionary?
@@ -229,7 +252,9 @@ final class NowPlayingService: ObservableObject {
             artworkURL: parts.count > 4 ? URL(string: parts[4]) : nil,
             isPlaying: parts[3].lowercased().contains("playing"),
             bundleIdentifier: "com.spotify.client",
-            source: .spotifyScript
+            source: .spotifyScript,
+            position: parts.count > 5 ? (Double(parts[5]) ?? 0) / 1000 : 0,
+            duration: parts.count > 6 ? (Double(parts[6]) ?? 0) / 1000 : 0
         )
     }
 }

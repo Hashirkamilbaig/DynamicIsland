@@ -11,6 +11,7 @@
 		C43B5381CC34433CA73EE17A /* NSScreen+Notch.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF722AFC90C54060A07CC98B /* NSScreen+Notch.swift */; };
 		0A326D305EB0492F9D8E9842 /* IslandLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818F014C9ECD4339865D1ED5 /* IslandLayout.swift */; };
 		5E1A7C2D9B3F4E6A8C0D1F21 /* MarqueeText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1A7C2D9B3F4E6A8C0D1F22 /* MarqueeText.swift */; };
+		5E1A7C2D9B3F4E6A8C0D1F31 /* PlaybackProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1A7C2D9B3F4E6A8C0D1F32 /* PlaybackProgressBar.swift */; };
 		C55AA5F980004AB68078ACBE /* DynamicIslandApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494D1B622A6B46DEB5A62D17 /* DynamicIslandApp.swift */; };
 		54932E9C4B534CE88809B65E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B172EC76F34BF98CAD12AB /* AppDelegate.swift */; };
 		699B0E12B8B84AE3A065859E /* IslandWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058EBA2BD5AF4ECABA09D927 /* IslandWindowController.swift */; };
@@ -52,6 +53,7 @@
 		B55A75EA05D34981B96D6FB8 /* IslandState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandState.swift; sourceTree = "<group>"; };
 		818F014C9ECD4339865D1ED5 /* IslandLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandLayout.swift; sourceTree = "<group>"; };
 		5E1A7C2D9B3F4E6A8C0D1F22 /* MarqueeText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarqueeText.swift; sourceTree = "<group>"; };
+		5E1A7C2D9B3F4E6A8C0D1F32 /* PlaybackProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackProgressBar.swift; sourceTree = "<group>"; };
 		43D925DB415E4D519E955221 /* ShelfStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfStore.swift; sourceTree = "<group>"; };
 		4D393CBAE8C047FFA319EC57 /* ShelfItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfItem.swift; sourceTree = "<group>"; };
 		1A86B811617B4295AA1068A3 /* ShelfDropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfDropView.swift; sourceTree = "<group>"; };
@@ -136,6 +138,7 @@
 				BF722AFC90C54060A07CC98B /* NSScreen+Notch.swift */,
 				818F014C9ECD4339865D1ED5 /* IslandLayout.swift */,
 				5E1A7C2D9B3F4E6A8C0D1F22 /* MarqueeText.swift */,
+				5E1A7C2D9B3F4E6A8C0D1F32 /* PlaybackProgressBar.swift */,
 			);
 			path = Island;
 			sourceTree = "<group>";
@@ -296,6 +299,7 @@
 				C43B5381CC34433CA73EE17A /* NSScreen+Notch.swift in Sources */,
 				0A326D305EB0492F9D8E9842 /* IslandLayout.swift in Sources */,
 				5E1A7C2D9B3F4E6A8C0D1F21 /* MarqueeText.swift in Sources */,
+				5E1A7C2D9B3F4E6A8C0D1F31 /* PlaybackProgressBar.swift in Sources */,
 				5F9BD25F56C84533A8D69C4C /* ShelfStore.swift in Sources */,
 				C6AB581E73BE42168544D841 /* ShelfItem.swift in Sources */,
 				B7D5C941FC13483B95AC9AFD /* ShelfDropView.swift in Sources */,
