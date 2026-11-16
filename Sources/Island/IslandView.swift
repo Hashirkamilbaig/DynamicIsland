@@ -146,16 +146,6 @@ struct IslandView: View {
             .help("System volume")
 
             Spacer()
-
-            Button {
-                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-            } label: {
-                Image(systemName: "gearshape.fill")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.7))
-            }
-            .buttonStyle(.plain)
-            .help("Settings")
         }
         .frame(height: 16)
     }
