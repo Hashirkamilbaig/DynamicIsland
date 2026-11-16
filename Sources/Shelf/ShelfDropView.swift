@@ -89,7 +89,9 @@ private struct ShelfItemChip: View {
         .padding(6)
         .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .onDrag {
-            NSItemProvider(contentsOf: item.cachedURL) ?? NSItemProvider()
+            let provider = NSItemProvider(object: item.cachedURL as NSURL)
+            provider.suggestedName = item.originalName
+            return provider
         }
         .contextMenu {
             Button("Remove") { store.remove(item) }

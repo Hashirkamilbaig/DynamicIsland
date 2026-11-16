@@ -61,6 +61,7 @@ final class ShelfStore: ObservableObject {
         let destination = uniqueDestination(for: originalName, id: id)
 
         do {
+            try fileManager.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
             try fileManager.copyItem(at: url, to: destination)
             let now = Date()
             let item = ShelfItem(
@@ -114,15 +115,21 @@ final class ShelfStore: ObservableObject {
         }
     }
 
+    /// One folder per item so the cached copy keeps its original filename,
+    /// which is what Finder uses when the file is dragged back out.
     private func uniqueDestination(for name: String, id: UUID) -> URL {
         let safeName = name.replacingOccurrences(of: "/", with: "_")
-        return cacheDirectory.appendingPathComponent("\(id.uuidString)-\(safeName)")
+        return cacheDirectory
+            .appendingPathComponent(id.uuidString, isDirectory: true)
+            .appendingPathComponent(safeName)
     }
 
     private func deleteFile(at url: URL) {
         do {
-            if fileManager.fileExists(atPath: url.path) {
-                try fileManager.removeItem(at: url)
+            let folder = url.deletingLastPathComponent()
+            let target = folder.standardizedFileURL == cacheDirectory.standardizedFileURL ? url : folder
+            if fileManager.fileExists(atPath: target.path) {
+                try fileManager.removeItem(at: target)
             }
         } catch {
             Log.shelf.error("Failed deleting \(url.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
