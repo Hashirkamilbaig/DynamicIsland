@@ -200,15 +200,9 @@ struct IslandView: View {
             }
             .buttonStyle(.plain)
 
-            Slider(
-                value: Binding(
-                    get: { Double(state.volume.isMuted ? 0 : state.volume.volume) },
-                    set: { state.volume.setVolume(Float($0)) }
-                ),
-                in: 0...1
-            )
-            .controlSize(.small)
-            .tint(.white)
+            VolumeSlider(value: state.volume.isMuted ? 0 : state.volume.volume) {
+                state.volume.setVolume($0)
+            }
 
             Text("\(Int((state.volume.isMuted ? 0 : state.volume.volume) * 100))%")
                 .font(.system(size: 10, weight: .medium).monospacedDigit())
