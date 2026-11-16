@@ -13,6 +13,7 @@ final class IslandState: ObservableObject {
     @Published private(set) var presence: Presence = .tucked
     /// True while the cursor (or an active file drag) is inside the island hit zone.
     @Published private(set) var isPointerInside = false
+    @Published var showVolume = false
 
     let shelf: ShelfStore
     let nowPlaying: NowPlayingService
@@ -22,6 +23,10 @@ final class IslandState: ObservableObject {
     private var tuckWorkItem: DispatchWorkItem?
 
     var isRevealed: Bool { presence == .revealed }
+
+    var bodyHeight: CGFloat {
+        showVolume ? IslandLayout.islandHeight : IslandLayout.compactIslandHeight
+    }
 
     init() {
         self.shelf = ShelfStore()
@@ -81,6 +86,7 @@ final class IslandState: ObservableObject {
         guard presence != .tucked else { return }
         Log.window.info("Tuck (\(reason, privacy: .public))")
         presence = .tucked
+        showVolume = false
     }
 
     /// Menu-bar helper only. Clicks on the island itself must not dismiss.

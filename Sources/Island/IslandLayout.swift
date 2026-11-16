@@ -4,7 +4,9 @@ enum IslandLayout {
     /// Expanded island width (wider than the hardware notch so it can swallow it).
     static let islandWidth: CGFloat = 520
     /// Full revealed height including the top band that covers the notch.
+    /// Tallest the island gets (volume row open); the panel is sized for this.
     static let islandHeight: CGFloat = 196
+    static let compactIslandHeight: CGFloat = 162
     /// Extra transparent margin so the soft outer shadow is not clipped by the panel.
     static let shadowPadding: CGFloat = 28
     static let panelWidth: CGFloat = islandWidth + shadowPadding * 2

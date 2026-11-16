@@ -134,9 +134,9 @@ final class IslandWindowController {
         if state.isRevealed, let panel {
             let body = NSRect(
                 x: panel.frame.midX - IslandLayout.islandWidth / 2,
-                y: panel.frame.maxY - IslandLayout.islandHeight,
+                y: panel.frame.maxY - state.bodyHeight,
                 width: IslandLayout.islandWidth,
-                height: IslandLayout.islandHeight
+                height: state.bodyHeight
             )
             return body.insetBy(dx: -8, dy: -8)
         }
@@ -196,8 +196,9 @@ final class IslandHostingView<Content: View>: NSHostingView<Content> {
         let bounds = self.bounds
         if revealed {
             let x = (bounds.width - IslandLayout.islandWidth) / 2
-            let y = bounds.height - IslandLayout.islandHeight
-            return NSRect(x: x, y: y, width: IslandLayout.islandWidth, height: IslandLayout.islandHeight)
+            let height = state?.bodyHeight ?? IslandLayout.islandHeight
+            let y = bounds.height - height
+            return NSRect(x: x, y: y, width: IslandLayout.islandWidth, height: height)
                 .insetBy(dx: -8, dy: -8)
         }
         let notch = window?.screen?.notchSize

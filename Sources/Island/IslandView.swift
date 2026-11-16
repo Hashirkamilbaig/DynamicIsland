@@ -3,7 +3,6 @@ import AppKit
 
 struct IslandView: View {
     @ObservedObject var state: IslandState
-    @State private var showVolume = false
 
     private var isRevealed: Bool { state.isRevealed }
 
@@ -27,7 +26,7 @@ struct IslandView: View {
             alignment: .top
         )
         .animation(isRevealed ? IslandMotion.grow : IslandMotion.shrink, value: state.presence)
-        .animation(.easeOut(duration: 0.18), value: showVolume)
+        .animation(IslandMotion.grow, value: state.showVolume)
         // Clicks do not dismiss. Drops are handled by IslandHostingView (AppKit).
     }
 
@@ -40,7 +39,7 @@ struct IslandView: View {
     }
 
     private var bodySize: CGSize {
-        isRevealed ? CGSize(width: IslandLayout.islandWidth, height: IslandLayout.islandHeight) : notch
+        isRevealed ? CGSize(width: IslandLayout.islandWidth, height: state.bodyHeight) : notch
     }
 
     private var islandChrome: some View {
@@ -57,7 +56,7 @@ struct IslandView: View {
                 .padding(.top, IslandLayout.notchClearance)
                 .padding(.horizontal, 22)
                 .padding(.bottom, 18)
-                .frame(width: IslandLayout.islandWidth, height: IslandLayout.islandHeight)
+                .frame(width: IslandLayout.islandWidth, height: state.bodyHeight)
                 .scaleEffect(isRevealed ? 1 : 0.4, anchor: .top)
                 .blur(radius: isRevealed ? 0 : 6)
                 .opacity(isRevealed ? 1 : 0)
@@ -97,9 +96,9 @@ struct IslandView: View {
                     .frame(width: IslandLayout.shelfWidth, height: IslandLayout.artSize)
             }
 
-            if showVolume {
+            if state.showVolume {
                 volumeRow
-                    .transition(.opacity)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
         .foregroundStyle(.white)
@@ -115,11 +114,11 @@ struct IslandView: View {
 
     private var volumeToggle: some View {
         Button {
-            withAnimation(.easeOut(duration: 0.18)) { showVolume.toggle() }
+            state.showVolume.toggle()
         } label: {
             Image(systemName: "speaker.wave.2.fill")
                 .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.white.opacity(showVolume ? 0.9 : 0.4))
+                .foregroundStyle(.white.opacity(state.showVolume ? 0.9 : 0.4))
                 .frame(width: 20, height: 18)
                 .contentShape(Rectangle())
         }
