@@ -2,7 +2,7 @@
 
 Floating island that stays tucked under the Mac notch until the pointer enters the notch region. When revealed it hugs the top of the screen so the black body blends with the hardware notch, with:
 
-1. **File shelf** — drop files in, drag them out for ~20 seconds, then they auto-purge
+1. **File shelf** — drop files in, drag them out for ~1 minute, then they auto-purge
 2. **Now Playing** — title / artist / artwork plus play, pause, next, previous
 3. **System volume** — Mac output-device volume (Core Audio), not Spotify’s in-app volume
 
@@ -43,7 +43,7 @@ Interaction: the island does not dismiss on click. It reveals when the cursor (o
 Sources/
   App/        entry + AppDelegate (menu bar, lifecycle)
   Island/     NSPanel host, SwiftUI island, shared state
-  Shelf/      ingest, 20s TTL, drop / drag UI
+  Shelf/      ingest, 60s TTL, drop / drag UI
   Media/      Now Playing + MediaRemoteBridge (private API isolated here)
   Volume/     Core Audio device volume + mute
   Support/    Logger categories, permissions helpers
@@ -57,8 +57,8 @@ Debug with Console.app filters on subsystem `com.hashir.DynamicIsland` and categ
 
 ### Shelf TTL
 
-- Change `ShelfStore.defaultTTL` (default `20`).
-- Watch logs: `Ingested … expires in 20s` then `Purged N expired shelf item(s)`.
+- Change `ShelfStore.defaultTTL` (default `60`).
+- Watch logs: `Ingested … expires in 60s` then `Purged N expired shelf item(s)`.
 - Cache path: `~/Library/Caches/DynamicIsland/Shelf/`.
 - Unit test: `ShelfStoreTests`.
 
@@ -76,5 +76,5 @@ Debug with Console.app filters on subsystem `com.hashir.DynamicIsland` and categ
 
 ## v1 success checks
 
-- Drop a PDF on the island → drag into Mail within 20s → works; after 20s the chip is gone.
+- Drop a PDF on the island → drag into Mail within 60s → works; after 60s the chip is gone.
 - Play Spotify → island shows track; skip/pause work; volume slider moves **Mac** volume.

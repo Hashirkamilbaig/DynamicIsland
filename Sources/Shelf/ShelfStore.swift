@@ -5,7 +5,7 @@ import Combine
 /// Ephemeral drop shelf: copies inbound files into a cache dir and purges after TTL.
 @MainActor
 final class ShelfStore: ObservableObject {
-    nonisolated static let defaultTTL: TimeInterval = 20
+    nonisolated static let defaultTTL: TimeInterval = 60
 
     @Published private(set) var items: [ShelfItem] = []
 
@@ -15,7 +15,7 @@ final class ShelfStore: ObservableObject {
     private var purgeTimer: Timer?
 
     init(
-        ttl: TimeInterval = 20,
+        ttl: TimeInterval = defaultTTL,
         fileManager: FileManager = .default,
         cacheDirectory: URL? = nil
     ) {
@@ -131,7 +131,7 @@ final class ShelfStore: ObservableObject {
 
     private func startPurgeTimer() {
         purgeTimer?.invalidate()
-        // Tick often enough that a 20s TTL feels accurate in the UI.
+        // Tick often enough that the TTL countdown feels accurate in the UI.
         purgeTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 self?.purgeExpired()
