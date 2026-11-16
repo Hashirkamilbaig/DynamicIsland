@@ -24,6 +24,8 @@ struct ShelfDropView: View {
             }
         }
         .padding(.horizontal, isExpanded ? 4 : 0)
+        // Parent IslandView owns drop targeting (so a drag can expand the tucked island).
+        // Keep a secondary drop zone here for drops onto the shelf chrome once revealed.
         .onDrop(of: [.fileURL], isTargeted: nil, perform: handleDrop)
     }
 

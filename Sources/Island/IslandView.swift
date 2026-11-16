@@ -3,9 +3,32 @@ import SwiftUI
 struct IslandView: View {
     @ObservedObject var state: IslandState
 
-    private var isExpanded: Bool { state.expansion == .expanded }
+    private var isRevealed: Bool { state.isRevealed }
 
     var body: some View {
+        ZStack(alignment: .top) {
+            // Invisible notch hit strip so hover/drag still work while tucked.
+            Color.clear
+                .frame(width: IslandLayout.notchHitWidth, height: IslandLayout.notchHitHeight)
+                .contentShape(Rectangle())
+
+            islandChrome
+                // Park the visible chrome up under the notch; hit strip stays put.
+                .offset(y: isRevealed ? IslandLayout.revealedTopPadding : IslandLayout.tuckedOffsetY)
+                .opacity(isRevealed ? 1 : 0.001)
+                .allowsHitTesting(isRevealed)
+        }
+        .frame(
+            width: IslandLayout.panelWidth,
+            height: isRevealed ? IslandLayout.revealedPanelHeight : IslandLayout.notchHitHeight,
+            alignment: .top
+        )
+        .animation(.spring(response: 0.34, dampingFraction: 0.86), value: state.presence)
+        .onHover { state.handleHover($0) }
+        // Clicks do not dismiss. Drops are handled by IslandHostingView (AppKit).
+    }
+
+    private var islandChrome: some View {
         ZStack {
             Capsule(style: .continuous)
                 .fill(Color.black.opacity(0.92))
@@ -13,71 +36,15 @@ struct IslandView: View {
                     Capsule(style: .continuous)
                         .stroke(Color.white.opacity(0.08), lineWidth: 1)
                 )
-                .shadow(color: .black.opacity(0.35), radius: isExpanded ? 18 : 10, y: 6)
+                .shadow(color: .black.opacity(isRevealed ? 0.35 : 0), radius: 18, y: 6)
 
-            Group {
-                if isExpanded {
-                    expandedContent
-                        .transition(.opacity.combined(with: .scale(scale: 0.96, anchor: .top)))
-                } else {
-                    collapsedContent
-                        .transition(.opacity)
-                }
-            }
-            .padding(.horizontal, isExpanded ? 16 : 14)
-            .padding(.vertical, isExpanded ? 14 : 8)
+            expandedContent
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+                .opacity(isRevealed ? 1 : 0)
         }
-        .frame(
-            width: isExpanded ? 420 : collapsedWidth,
-            height: isExpanded ? 168 : 34
-        )
-        .animation(.spring(response: 0.38, dampingFraction: 0.82), value: state.expansion)
+        .frame(width: IslandLayout.islandWidth, height: IslandLayout.islandHeight)
         .animation(.easeOut(duration: 0.2), value: state.nowPlaying.info.title)
-        .onHover { state.handleHover($0) }
-        .onTapGesture { state.toggle() }
-        .contentShape(Capsule())
-    }
-
-    private var collapsedWidth: CGFloat {
-        if state.nowPlaying.info.hasTrack { return 220 }
-        if !state.shelf.items.isEmpty { return 160 }
-        return 120
-    }
-
-    private var collapsedContent: some View {
-        HStack(spacing: 10) {
-            if let art = state.nowPlaying.info.artwork {
-                Image(nsImage: art)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 18, height: 18)
-                    .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-            } else {
-                Circle()
-                    .fill(Color.white.opacity(state.nowPlaying.info.isPlaying ? 0.9 : 0.35))
-                    .frame(width: 8, height: 8)
-            }
-
-            if state.nowPlaying.info.hasTrack {
-                Text(state.nowPlaying.info.title)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-            } else {
-                Text("Island")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.85))
-            }
-
-            if !state.shelf.items.isEmpty {
-                Text("\(state.shelf.items.count)")
-                    .font(.system(size: 10, weight: .bold).monospacedDigit())
-                    .foregroundStyle(.black)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(Color.white.opacity(0.9), in: Capsule())
-            }
-        }
     }
 
     private var expandedContent: some View {
@@ -161,4 +128,18 @@ struct IslandView: View {
                 .frame(width: 34, alignment: .trailing)
         }
     }
+}
+
+enum IslandLayout {
+    static let islandWidth: CGFloat = 420
+    static let islandHeight: CGFloat = 168
+    static let panelWidth: CGFloat = 420
+    /// Visible island + top padding while revealed.
+    static let revealedPanelHeight: CGFloat = 188
+    static let revealedTopPadding: CGFloat = 6
+    /// Notch sensor: wide enough for the physical notch, short so it sits in the menu-bar band.
+    static let notchHitWidth: CGFloat = 320
+    static let notchHitHeight: CGFloat = 28
+    /// Pull chrome upward so it sits under/behind the notch when tucked.
+    static let tuckedOffsetY: CGFloat = -IslandLayout.islandHeight
 }

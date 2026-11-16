@@ -4,20 +4,24 @@ import AppKit
 
 @MainActor
 final class IslandState: ObservableObject {
-    enum Expansion: Equatable {
-        case collapsed
-        case expanded
+    /// Tucked = parked under the notch. Revealed = slid out for interaction.
+    enum Presence: Equatable {
+        case tucked
+        case revealed
     }
 
-    @Published var expansion: Expansion = .collapsed
+    @Published var presence: Presence = .tucked
     @Published var isHovering = false
+    @Published var isDragTargeted = false
 
     let shelf: ShelfStore
     let nowPlaying: NowPlayingService
     let volume: SystemVolumeService
 
     private var cancellables = Set<AnyCancellable>()
-    private var collapseWorkItem: DispatchWorkItem?
+    private var tuckWorkItem: DispatchWorkItem?
+
+    var isRevealed: Bool { presence == .revealed }
 
     init() {
         self.shelf = ShelfStore()
@@ -34,7 +38,6 @@ final class IslandState: ObservableObject {
     }
 
     private func observeChildren() {
-
         shelf.objectWillChange
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in self?.objectWillChange.send() }
@@ -49,18 +52,6 @@ final class IslandState: ObservableObject {
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in self?.objectWillChange.send() }
             .store(in: &cancellables)
-
-        shelf.$items
-            .receive(on: RunLoop.main)
-            .sink { [weak self] items in
-                guard let self else { return }
-                if !items.isEmpty {
-                    self.expand(reason: "shelf")
-                } else if self.expansion == .expanded, !self.isHovering {
-                    self.scheduleCollapse(after: 1.2)
-                }
-            }
-            .store(in: &cancellables)
     }
 
     func start() {
@@ -68,49 +59,61 @@ final class IslandState: ObservableObject {
         volume.refresh()
     }
 
-    func expand(reason: String) {
-        collapseWorkItem?.cancel()
-        if expansion != .expanded {
-            Log.window.debug("Expand (\(reason, privacy: .public))")
+    /// Bring the island out from under the notch.
+    func reveal(reason: String) {
+        tuckWorkItem?.cancel()
+        if presence != .revealed {
+            Log.window.debug("Reveal (\(reason, privacy: .public))")
         }
-        expansion = .expanded
+        presence = .revealed
     }
 
-    func collapse(reason: String) {
-        collapseWorkItem?.cancel()
-        guard shelf.items.isEmpty else { return }
-        if expansion != .collapsed {
-            Log.window.debug("Collapse (\(reason, privacy: .public))")
+    /// Park the island back under the notch.
+    func tuck(reason: String) {
+        tuckWorkItem?.cancel()
+        if presence != .tucked {
+            Log.window.debug("Tuck (\(reason, privacy: .public))")
         }
-        expansion = .collapsed
+        presence = .tucked
     }
 
-    func toggle() {
-        if expansion == .expanded {
-            collapse(reason: "toggle")
+    /// Menu-bar helper only. Clicks on the island itself must not dismiss.
+    func toggleFromMenu() {
+        if isRevealed {
+            tuck(reason: "menu")
         } else {
-            expand(reason: "toggle")
+            reveal(reason: "menu")
         }
     }
 
     func handleHover(_ hovering: Bool) {
         isHovering = hovering
         if hovering {
-            expand(reason: "hover")
+            reveal(reason: "hover")
         } else {
-            scheduleCollapse(after: 0.8)
+            scheduleTuckIfIdle(after: 0.35)
         }
     }
 
-    private func scheduleCollapse(after delay: TimeInterval) {
-        collapseWorkItem?.cancel()
+    func handleDragTargeted(_ targeted: Bool) {
+        isDragTargeted = targeted
+        if targeted {
+            reveal(reason: "drag")
+        } else {
+            scheduleTuckIfIdle(after: 0.45)
+        }
+    }
+
+    private func scheduleTuckIfIdle(after delay: TimeInterval) {
+        tuckWorkItem?.cancel()
         let work = DispatchWorkItem { [weak self] in
             guard let self else { return }
-            if !self.isHovering, self.shelf.items.isEmpty {
-                self.collapse(reason: "idle")
+            // Stay out while the pointer or an active file drag is over the island.
+            if !self.isHovering, !self.isDragTargeted {
+                self.tuck(reason: "pointer-left")
             }
         }
-        collapseWorkItem = work
+        tuckWorkItem = work
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
     }
 }

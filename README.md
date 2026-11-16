@@ -1,6 +1,6 @@
 # Dynamic Island (macOS)
 
-Floating pill at the top of the screen with:
+Floating island that stays tucked under the Mac notch until the pointer enters the notch region, with:
 
 1. **File shelf** — drop files in, drag them out for ~20 seconds, then they auto-purge
 2. **Now Playing** — title / artist / artwork plus play, pause, next, previous
@@ -33,7 +33,9 @@ Signing: Debug uses ad-hoc identity (`CODE_SIGN_IDENTITY = "-"`) so a free Apple
 
 No Full Disk Access. Shelf files live under `~/Library/Caches/DynamicIsland/Shelf/`.
 
-The app is an agent (`LSUIElement`): no Dock icon. Use the menu-bar capsule icon → **Show Island** / **Quit**.
+The app is an agent (`LSUIElement`): no Dock icon. Use the menu-bar capsule icon → **Reveal / Hide** / **Quit**.
+
+Interaction: the island does not dismiss on click. It reveals when the cursor (or a file drag) enters the notch band, and tucks again when the pointer leaves.
 
 ## Folder map
 

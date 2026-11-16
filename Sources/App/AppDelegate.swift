@@ -20,7 +20,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         controller.show()
         self.windowController = controller
 
-        state.$expansion
+        state.$presence
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 self?.windowController?.updateSizeForExpansion()
@@ -44,7 +44,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         let menu = NSMenu()
         menu.addItem(NSMenuItem(title: "Show Island", action: #selector(showIsland), keyEquivalent: "s"))
-        menu.addItem(NSMenuItem(title: "Toggle Expand", action: #selector(toggleIsland), keyEquivalent: "e"))
+        menu.addItem(NSMenuItem(title: "Reveal / Hide", action: #selector(toggleIsland), keyEquivalent: "e"))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Quit Dynamic Island", action: #selector(quit), keyEquivalent: "q"))
         item.menu = menu
@@ -52,11 +52,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func showIsland() {
+        state?.reveal(reason: "menu-show")
         windowController?.show()
     }
 
     @objc private func toggleIsland() {
-        state?.toggle()
+        state?.toggleFromMenu()
     }
 
     @objc private func quit() {
