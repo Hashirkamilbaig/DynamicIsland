@@ -7,6 +7,7 @@ struct NowPlayingInfo: Equatable {
     var artist: String = ""
     var album: String = ""
     var artwork: NSImage?
+    var artworkURL: URL?
     var isPlaying: Bool = false
     var bundleIdentifier: String?
     var source: Source = .none
@@ -28,6 +29,7 @@ struct NowPlayingInfo: Equatable {
             && lhs.isPlaying == rhs.isPlaying
             && lhs.bundleIdentifier == rhs.bundleIdentifier
             && lhs.source == rhs.source
+            && lhs.artworkURL == rhs.artworkURL
             && (lhs.artwork == nil) == (rhs.artwork == nil)
     }
 }
@@ -42,6 +44,7 @@ final class NowPlayingService: ObservableObject {
     /// Refreshes that land right after a tap can still report the old state; keep the
     /// optimistic play/pause value until the player has had time to catch up.
     private var optimisticPlayStateUntil = Date.distantPast
+    private let artworkLoader = ArtworkLoader()
 
     func start() {
         if MediaRemoteBridge.isAvailable {
@@ -176,6 +179,16 @@ final class NowPlayingService: ObservableObject {
         if Date() < optimisticPlayStateUntil {
             next.isPlaying = info.isPlaying
         }
+        if next.artwork == nil, let url = next.artworkURL {
+            if let cached = artworkLoader.cachedImage(for: url) {
+                next.artwork = cached
+            } else {
+                artworkLoader.load(url) { [weak self] image in
+                    guard let self, self.info.artworkURL == url else { return }
+                    self.info.artwork = image
+                }
+            }
+        }
         info = next
     }
 
@@ -191,7 +204,8 @@ final class NowPlayingService: ObservableObject {
           set a to artist of current track
           set al to album of current track
           set playingState to player state as string
-          return t & "|||" & a & "|||" & al & "|||" & playingState
+          set art to artwork url of current track
+          return t & "|||" & a & "|||" & al & "|||" & playingState & "|||" & art
         end tell
         """
         var error: NSDictionary?
@@ -212,6 +226,7 @@ final class NowPlayingService: ObservableObject {
             artist: parts[1],
             album: parts[2],
             artwork: nil,
+            artworkURL: parts.count > 4 ? URL(string: parts[4]) : nil,
             isPlaying: parts[3].lowercased().contains("playing"),
             bundleIdentifier: "com.spotify.client",
             source: .spotifyScript
