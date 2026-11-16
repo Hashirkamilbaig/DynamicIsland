@@ -131,9 +131,11 @@ final class IslandWindowController {
     }
 
     private func notchHitBand(on screen: NSScreen) -> NSRect {
+        // Use the layout constants as-is. Do not inflate with safeAreaInsets —
+        // that was keeping the hot zone ~menu-bar tall no matter how small we set it.
         let screenFrame = screen.frame
         let width = IslandLayout.notchHitWidth
-        let height = max(IslandLayout.notchHitHeight, screen.safeAreaInsets.top + 8)
+        let height = IslandLayout.notchHitHeight
         return NSRect(
             x: screenFrame.midX - width / 2,
             y: screenFrame.maxY - height,

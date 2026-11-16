@@ -14,9 +14,10 @@ enum IslandLayout {
     static let bottomCornerRadius: CGFloat = 42
     static let artSize: CGFloat = 92
 
-    /// Notch sensor while tucked.
-    static let notchHitWidth: CGFloat = 22.5
-    static let notchHitHeight: CGFloat = 2.75
+    /// Notch sensor while tucked. Kept intentionally tiny (was previously
+    /// overridden to ~safeAreaInsets.top, which made shrinks look like no-ops).
+    static let notchHitWidth: CGFloat = 36
+    static let notchHitHeight: CGFloat = 3
     /// Pull chrome upward so it sits under the notch when tucked.
     static let tuckedOffsetY: CGFloat = -islandHeight
 }
